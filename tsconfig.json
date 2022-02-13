@@ -11,7 +11,10 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "removeComments": true,
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+    "sourceRoot": "./src",
+    "baseUrl": "./src",
+    "rootDir": "./src"
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }
