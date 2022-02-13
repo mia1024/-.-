@@ -16,9 +16,9 @@
 </template>
 
 <script lang="ts" setup>
-import Tree from "./components/Graph.vue"
-import Library from "./components/Library.vue"
-import Code from "./components/Code.vue"
+import Tree from "@/components/Graph.vue"
+import Library from "@/components/Library.vue"
+import Code from "@/components/Code.vue"
 </script>
 
 <style scoped lang="scss">

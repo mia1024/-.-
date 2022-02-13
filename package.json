@@ -11,6 +11,7 @@
   "license": "GPLv3",
   "private": false,
   "devDependencies": {
+    "@types/node": "^17.0.17",
     "@vitejs/plugin-vue": "^2.2.0",
     "@vue/compiler-sfc": "^3.2.31",
     "dexie": "^3.2.0",
