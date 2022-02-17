@@ -20,7 +20,9 @@
     "rootDir": "./src",
     "paths": {
       "@/*": ["*"],
-      "@components/*": ["components/*"]
+      "@components/*": ["components/*.vue"],
+      "@lib/*": ["lib/*"],
+      "@store/*": ["store/*"]
     }
   },
   "include": [
