@@ -15,6 +15,8 @@ export default defineConfig({
     extensions: [".ts", ".vue"],
   },
   build: {
+    outDir: path.join(__dirname, "dist"),
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         app: "src/index.html",
