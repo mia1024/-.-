@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import path from "path";
 
 export default defineConfig({
+  root: "src",
   plugins: [vue()],
   resolve: {
     alias: {
@@ -19,5 +20,6 @@ export default defineConfig({
         app: "src/index.html",
       },
     },
+    sourcemap: true,
   },
 });

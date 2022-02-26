@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "serve": "vite serve src --config vite.config.ts",
+    "serve": "vite serve",
     "build": "vite build"
   },
   "name": "lambda",
