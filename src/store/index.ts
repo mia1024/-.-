@@ -1,59 +1,50 @@
 import * as Pinia from "pinia";
 import * as Vue from "vue";
 import * as Syntax from "../lib/syntax";
+import * as SyntaxState from "../lib/state";
+
+type BoundingBox = Record<"left" | "top" | "width" | "height", number>;
+type Geometry = Record<"tree" | "node", BoundingBox>;
 
 export interface State {
-  root: symbol;
-  nodes: Record<symbol, Syntax.Expression>;
+  syntax: SyntaxState.TreeState;
+  geometry: Map<Syntax.TreeKey, Geometry>;
+
+  // updated each time tree structure is modified; useful for triggering
+  // DOM-layout detection stuff.  maybe we can use `ResizeObserver` too, but
+  // we'll figure that out later.
+  stamp: symbol;
 }
 
 export const store = Pinia.defineStore("main", {
   state: (): State => {
-    const rootKey = Symbol("root");
     return {
-      root: rootKey,
-      nodes: {
-        [rootKey]: { data: { type: <const>Syntax.ExpressionType.Blank } },
-      },
+      syntax: SyntaxState.init(),
+      geometry: new Map<Syntax.TreeKey, Geometry>(),
+      stamp: Symbol(),
     };
   },
+  getters: {},
   actions: {
-    reset() {
-      this.nodes = {
-        [this.root]: { data: { type: Syntax.ExpressionType.Blank } },
-      };
-    },
     clear(key: symbol) {
-      this.nodes[key]!.data = { type: Syntax.ExpressionType.Blank };
+      SyntaxState.prune(this.syntax, key);
+      this.stamp = Symbol();
     },
     insertVariable(key: symbol) {
-      this.nodes[key] = {
-        data: { type: Syntax.ExpressionType.Variable, name: "x" },
-      };
+      SyntaxState.makeVariable(this.syntax, key);
+      this.stamp = Symbol();
     },
     insertAbstraction(key: symbol) {
-      const bodyKey = Symbol("body");
-      this.nodes[bodyKey] = { data: { type: Syntax.ExpressionType.Blank } };
-      this.nodes[key] = {
-        data: {
-          type: Syntax.ExpressionType.Abstraction,
-          parameterName: "x",
-          body: bodyKey,
-        },
-      };
+      SyntaxState.makeAbstraction(this.syntax, key);
+      this.stamp = Symbol();
     },
     insertApplication(key: symbol) {
-      const fnKey = Symbol();
-      const argKey = Symbol();
-      this.nodes[fnKey] = { data: { type: Syntax.ExpressionType.Blank } };
-      this.nodes[argKey] = { data: { type: Syntax.ExpressionType.Blank } };
-      this.nodes[key] = {
-        data: {
-          type: Syntax.ExpressionType.Application,
-          function: fnKey,
-          argument: argKey,
-        },
-      };
+      SyntaxState.makeApplication(this.syntax, key);
+      this.stamp = Symbol();
+    },
+    updateGeometry(key: symbol, geometry: Geometry) {
+      // TODO merge this into the node state properties
+      this.geometry.set(key, geometry);
     },
   },
 });

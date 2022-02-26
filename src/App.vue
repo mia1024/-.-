@@ -16,13 +16,13 @@
 </template>
 
 <script lang="ts" setup>
-import Tree from "@/components/Graph.vue";
-import Library from "@/components/Library.vue";
-import Code from "@/components/Code.vue";
+import Tree from "@components/Graph.vue";
+import Library from "@components/Library.vue";
+import Code from "@components/Code.vue";
 
-import * as Store from './store'
+import * as Store from "./store";
 
-const store = Store.store()
+const store = Store.store();
 </script>
 
 <style scoped lang="scss">

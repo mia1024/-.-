@@ -1,94 +1,104 @@
-export const enum ExpressionType {
+export const enum NodeType {
   Variable,
   Abstraction,
   Application,
   Blank,
 }
 
-// We parametrize `Expression` by the `Subtree` type to conveniently enable
+// We parametrize `Node` by the `Subtree` type to conveniently enable
 // both the structured and flattened tree representations.  The structured
-// representation (subtrees are stored directly as nested `Expression`s) is
+// representation (subnodes are stored directly as nested `Node`s) is
 // self-contained and a simpler/nicer data representation, but the flattened
-// representation (subtrees are stored as references via TreeKeys/IDs
+// representation (subnodes are stored as references via TreeKeys/IDs
 // corresponding to keys in a dictionary) is more well-adapted to encoding UI
-// state.  The `Extra` type parameter is used to optionally attach extra
-// UI-relevant data--e.g., line/column position, etc.
-export interface Expression<Subtree, Extra> {
+// state.
+export interface Node<Subtree> {
   data:
-    | { type: ExpressionType.Blank }
-    | { type: ExpressionType.Variable; name: string }
+    | { type: NodeType.Blank }
+    | { type: NodeType.Variable; name: string }
     | {
-        type: ExpressionType.Abstraction;
+        type: NodeType.Abstraction;
         parameter: string;
         body: Subtree;
       }
     | {
-        type: ExpressionType.Application;
+        type: NodeType.Application;
         function: Subtree;
         argument: Subtree;
       };
-  extra: Extra;
 }
 
+export const blank = <Subtree>(): Node<Subtree> => ({
+  data: { type: NodeType.Blank },
+});
+export const variable = <Subtree>(name: string): Node<Subtree> => ({
+  data: { type: NodeType.Variable, name },
+});
+export const abstraction = <Subtree>(
+  parameter: string,
+  body: Subtree
+): Node<Subtree> => ({ data: { type: NodeType.Abstraction, parameter, body } });
+
+export const application = <Subtree>(
+  fn: Subtree,
+  argument: Subtree
+): Node<Subtree> => ({
+  data: { type: NodeType.Application, function: fn, argument },
+});
+
 // structured representation
-export type Tree<Extra> = Expression<Tree<Extra>, Extra>;
+export type Tree = Node<Tree>;
 
 // flattened representation
-type TreeKey = symbol; // feeling cute, might change later
-export type TreeDict<Extra> = Map<TreeKey, Expression<TreeKey, Extra>>;
+export type TreeKey = symbol; // feeling cute, might change later
+export const newTreeKey = (): TreeKey => Symbol();
 
-export const structure = <Extra>(
-  trees: TreeDict<Extra>,
-  root: TreeKey
-): Tree<Extra> => {
-  const node = trees.get(root);
+export type TreeDict = Map<TreeKey, Node<TreeKey>>;
+export const newTreeDict = () => new Map<TreeKey, Node<TreeKey>>();
+
+export const structure = (nodes: TreeDict, root: TreeKey): Tree => {
+  const node = nodes.get(root);
   if (typeof node === "undefined") throw new Error("missing subtree root");
 
   switch (node.data.type) {
-    case ExpressionType.Blank:
-    case ExpressionType.Variable:
-      return { extra: node.extra, data: node.data };
-    case ExpressionType.Abstraction:
+    case NodeType.Blank:
+    case NodeType.Variable:
+      return { data: node.data };
+    case NodeType.Abstraction:
       return {
-        extra: node.extra,
         data: {
           ...node.data,
-          body: structure(trees, node.data.body),
+          body: structure(nodes, node.data.body),
         },
       };
-    case ExpressionType.Application:
+    case NodeType.Application:
       return {
-        extra: node.extra,
         data: {
           ...node.data,
-          function: structure(trees, node.data.function),
-          argument: structure(trees, node.data.argument),
+          function: structure(nodes, node.data.function),
+          argument: structure(nodes, node.data.argument),
         },
       };
   }
 };
 
-export const flatten = <Extra>(
-  tree: Tree<Extra>
-): { trees: TreeDict<Extra>; root: TreeKey } => {
-  const trees = new Map<TreeKey, Expression<TreeKey, Extra>>();
+export const flatten = (tree: Tree): { nodes: TreeDict; root: TreeKey } => {
+  const nodes = treeDict();
 
-  const go = (subtree: Tree<Extra>): TreeKey => {
+  const go = (subtree: Tree): TreeKey => {
     const key = Symbol();
     switch (subtree.data.type) {
-      case ExpressionType.Blank:
-      case ExpressionType.Variable:
-        trees.set(key, { extra: subtree.extra, data: subtree.data });
+      case NodeType.Blank:
+      case NodeType.Variable:
+        nodes.set(key, { data: subtree.data });
         break;
-      case ExpressionType.Abstraction:
-        trees.set(key, {
-          extra: subtree.extra,
+      case NodeType.Abstraction:
+        nodes.set(key, {
           data: { ...subtree.data, body: go(subtree.data.body) },
         });
         break;
-      case ExpressionType.Application:
-        trees.set(key, {
-          extra: subtree.extra,
+      case NodeType.Application:
+        nodes.set(key, {
           data: {
             ...subtree.data,
             function: go(subtree.data.function),
@@ -100,27 +110,25 @@ export const flatten = <Extra>(
     return key;
   };
 
-  return { trees, root: go(tree) };
+  return { nodes, root: go(tree) };
 };
 
-export const stringifyCompact = <Extra>(expr: Tree<Extra>): string => {
+export const stringifyCompact = (expr: Tree): string => {
   switch (expr.data.type) {
-    case ExpressionType.Blank:
+    case NodeType.Blank:
       return "_";
-    case ExpressionType.Variable:
+    case NodeType.Variable:
       return expr.data.name;
-    case ExpressionType.Abstraction:
+    case NodeType.Abstraction:
       return `λ${expr.data.parameter}. ${stringifyCompact(expr.data.body)}`;
-    case ExpressionType.Application:
+    case NodeType.Application:
       const arg = stringifyCompact(expr.data.argument);
       const fn = stringifyCompact(expr.data.function);
       const parenFn =
-        expr.data.function.data.type === ExpressionType.Abstraction
-          ? `(${fn})`
-          : fn;
+        expr.data.function.data.type === NodeType.Abstraction ? `(${fn})` : fn;
       const parenArg =
-        expr.data.argument.data.type === ExpressionType.Abstraction ||
-        expr.data.argument.data.type === ExpressionType.Application
+        expr.data.argument.data.type === NodeType.Abstraction ||
+        expr.data.argument.data.type === NodeType.Application
           ? `(${arg})`
           : arg;
       return `${parenFn} ${parenArg}`;

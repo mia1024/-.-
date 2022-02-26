@@ -2,6 +2,10 @@
 import * as Syntax from "../lib/syntax";
 import * as Store from "../store";
 import * as Vue from "vue";
+
+const tree: Vue.Ref<HTMLElement | null> = Vue.ref(null);
+const node: Vue.Ref<HTMLElement | null> = Vue.ref(null);
+
 const props = defineProps<{
   nodeKey: symbol;
 }>();
@@ -9,85 +13,185 @@ const props = defineProps<{
 const store = Store.store();
 
 // TODO fix unsafe index
-const expr = Vue.computed(() => store.nodes[props.nodeKey]!);
+const expr = Vue.computed(() => store.syntax.nodes.get(props.nodeKey)!);
+
+const getBox = (elem: HTMLElement) => ({
+  left: elem.offsetLeft,
+  top: elem.offsetTop,
+  height: elem.offsetHeight,
+  width: elem.offsetWidth,
+});
+
+const updateGeometry = () => {
+  if (tree.value === null || node.value === null) return;
+
+  store.updateGeometry(props.nodeKey, {
+    tree: getBox(tree.value),
+    node: getBox(node.value),
+  });
+};
+
+Vue.watch(
+  () => store.stamp,
+  () => Vue.nextTick(updateGeometry)
+);
+Vue.onMounted(() => {
+  updateGeometry();
+  window.addEventListener("resize", updateGeometry);
+});
+Vue.onUnmounted(() => {});
 </script>
 
 <script></script>
 
 <template>
-  <div class="node">
-    <button
-      @click="store.clear(nodeKey)"
-      class="close"
-      v-if="expr.data.type !== Syntax.ExpressionType.Blank"
-    >
-      ×
-    </button>
-    <div class="data">
-      <div v-if="expr.data.type === Syntax.ExpressionType.Blank">
+  <div class="tree" ref="tree">
+    <div class="node" ref="node">
+      <button
+        @click="store.clear(nodeKey)"
+        class="close"
+        v-if="expr.data.type !== Syntax.NodeType.Blank"
+      >
+        ×
+      </button>
+      <div v-if="expr.data.type === Syntax.NodeType.Blank" class="blank">
+        <div class="hole" />
         <div class="new">
-          <button @click="store.insertVariable(nodeKey)">+var</button>
-          <button @click="store.insertAbstraction(nodeKey)">+abs</button>
-          <button @click="store.insertApplication(nodeKey)">+app</button>
+          <button @click="store.insertVariable(nodeKey)">𝑥</button>
+          <button @click="store.insertAbstraction(nodeKey)">λ</button>
+          <button @click="store.insertApplication(nodeKey)">$</button>
         </div>
       </div>
-      <div v-if="expr.data.type === Syntax.ExpressionType.Variable">
-        <div class="var">var <input v-model="expr.data.name" /></div>
-      </div>
-      <div v-if="expr.data.type === Syntax.ExpressionType.Abstraction">
-        <div class="param">λ <input v-model="expr.data.parameterName" /></div>
-        <div class="body">
-          <Tree :nodeKey="expr.data.body" />
-        </div>
-      </div>
-      <div v-if="expr.data.type === Syntax.ExpressionType.Application">
-        <div class="apply">@</div>
-        <div class="application">
-          <Tree :nodeKey="expr.data.function" />
-          <Tree :nodeKey="expr.data.argument" />
-        </div>
-      </div>
+      <template v-if="expr.data.type === Syntax.NodeType.Variable">
+        <input class="var" v-model="expr.data.name" />
+      </template>
+      <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
+        λ
+      </template>
+      <template v-if="expr.data.type === Syntax.NodeType.Application">
+        $
+      </template>
+    </div>
+    <div class="children">
+      <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
+        <div class="param">λ <input v-model="expr.data.parameter" /></div>
+        <TreeNode :nodeKey="expr.data.body" />
+      </template>
+      <template v-if="expr.data.type === Syntax.NodeType.Application">
+        <TreeNode :nodeKey="expr.data.function" />
+        <TreeNode :nodeKey="expr.data.argument" />
+      </template>
     </div>
   </div>
 </template>
 
-<style>
-.node {
+<style scoped lang="scss">
+.tree {
   display: grid;
-  grid-template-areas: "data close";
-}
-
-.close {
-  background: none;
-  border: none;
-  grid-area: close;
+  grid-template-areas: "node" "children";
+  grid-row-gap: 2rem;
   align-self: start;
-  cursor: pointer;
-  opacity: 0.5;
-}
-.close:hover {
-  opacity: 1;
+
+  background-color: rgba(0, 80, 50, 0.03);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
 }
 
-.data {
-  grid-area: data;
-}
-
-.new {
-  display: flex;
-  flex-direction: column;
-}
-
-.var,
-.param {
-  border: 1px solid #ddd;
+.node {
+  position: relative;
+  grid-area: node;
+  justify-self: center;
+  align-self: start;
+  padding: 1rem;
   background-color: #eee;
-  padding: 0.5rem 1rem;
+  border-radius: 0.125rem;
+
+  .close {
+    visibility: hidden;
+
+    height: 0;
+    width: 0;
+    color: red;
+    padding: 0;
+
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    cursor: pointer;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  &:hover .close {
+    visibility: visible;
+  }
+
+  .var {
+    width: 3rem;
+    text-align: center;
+  }
 }
 
-.var input,
-.param input {
-  width: 3rem;
+.children {
+  grid-area: children;
+
+  display: flex;
+  & > * + * {
+    margin-left: 2rem;
+  }
+}
+
+.blank {
+  position: relative;
+  .hole {
+    border: 1px solid gray;
+    width: 1em;
+    height: 1em;
+    border-radius: 0.5em;
+  }
+  .node:hover & .new {
+    visibility: visible;
+  }
+  .new {
+    visibility: hidden;
+    position: absolute;
+    display: flex;
+    bottom: 100%;
+    left: 100%;
+    z-index: 1;
+    flex-direction: row;
+    font-size: 0.75em;
+    margin-left: 0.5em;
+
+    button {
+      background: #bee;
+      padding: 0.125em 0.5em;
+      cursor: pointer;
+      border: none;
+      border-radius: 2px;
+      & + button {
+        margin-left: 0.5rem;
+      }
+      &:hover {
+        background: #9dc;
+      }
+    }
+  }
+}
+
+.param {
+  background-color: #eee;
+  padding: 0.5rem;
+  align-self: start;
+
+  input {
+    width: 3rem;
+  }
 }
 
 .body {
