@@ -46,31 +46,33 @@ Vue.onUnmounted(() => {});
 
 <template>
   <div class="tree" ref="tree">
-    <div class="node" ref="node">
-      <button
-        @click="store.clear(nodeKey)"
-        class="close"
-        v-if="expr.data.type !== Syntax.NodeType.Blank"
-      >
-        ×
-      </button>
-      <div v-if="expr.data.type === Syntax.NodeType.Blank" class="blank">
-        <div class="hole" />
-        <div class="new">
-          <button @click="store.insertVariable(nodeKey)">𝑥</button>
-          <button @click="store.insertAbstraction(nodeKey)">λ</button>
-          <button @click="store.insertApplication(nodeKey)">$</button>
-        </div>
+    <div class="node-pad">
+      <div class="node" ref="node">
+        <button
+          @click="store.clear(nodeKey)"
+          class="close"
+          v-if="expr.data.type !== Syntax.NodeType.Blank"
+        >
+          ×
+        </button>
+        <template v-if="expr.data.type === Syntax.NodeType.Blank">
+          <div class="hole" />
+          <div class="new">
+            <button @click="store.insertVariable(nodeKey)">𝑥</button>
+            <button @click="store.insertAbstraction(nodeKey)">λ</button>
+            <button @click="store.insertApplication(nodeKey)">$</button>
+          </div>
+        </template>
+        <template v-if="expr.data.type === Syntax.NodeType.Variable">
+          <input class="var" v-model="expr.data.name" />
+        </template>
+        <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
+          λ
+        </template>
+        <template v-if="expr.data.type === Syntax.NodeType.Application">
+          $
+        </template>
       </div>
-      <template v-if="expr.data.type === Syntax.NodeType.Variable">
-        <input class="var" v-model="expr.data.name" />
-      </template>
-      <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
-        λ
-      </template>
-      <template v-if="expr.data.type === Syntax.NodeType.Application">
-        $
-      </template>
     </div>
     <div class="children">
       <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
@@ -97,24 +99,36 @@ Vue.onUnmounted(() => {});
   border-radius: 0.5rem;
 }
 
-.node {
-  position: relative;
+.node-pad {
   grid-area: node;
   justify-self: center;
   align-self: start;
+  padding: 0;
+  margin: -1rem;
   padding: 1rem;
+
+  &:hover {
+    .close,
+    .new {
+      visibility: visible;
+    }
+  }
+}
+.node {
+  position: relative;
   background-color: #eee;
-  border-radius: 0.125rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 0.5rem;
 
   .close {
     visibility: hidden;
 
-    height: 0;
-    width: 0;
-    color: red;
-    padding: 0;
+    color: white;
+    background-color: #f67;
+    padding: 0.125em 0.25em;
+    line-height: 1em;
 
-    background: none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -123,12 +137,10 @@ Vue.onUnmounted(() => {});
     cursor: pointer;
 
     position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  &:hover .close {
-    visibility: visible;
+    bottom: 100%;
+    right: 100%;
+    margin-right: -0.25em;
+    margin-bottom: -0.25em;
   }
 
   .var {
@@ -146,40 +158,35 @@ Vue.onUnmounted(() => {});
   }
 }
 
-.blank {
-  position: relative;
-  .hole {
-    border: 1px solid gray;
-    width: 1em;
-    height: 1em;
-    border-radius: 0.5em;
-  }
-  .node:hover & .new {
-    visibility: visible;
-  }
-  .new {
-    visibility: hidden;
-    position: absolute;
-    display: flex;
-    bottom: 100%;
-    left: 100%;
-    z-index: 1;
-    flex-direction: row;
-    font-size: 0.75em;
-    margin-left: 0.5em;
+.hole {
+  border: 1px solid gray;
+  width: 1em;
+  height: 1em;
+  border-radius: 0.5em;
+}
+.new {
+  visibility: hidden;
+  position: absolute;
+  display: flex;
+  bottom: 100%;
+  left: 100%;
+  z-index: 1;
+  flex-direction: row;
+  font-size: 0.75em;
+  margin-left: -0.25em;
+  margin-bottom: -0.25em;
 
-    button {
-      background: #bee;
-      padding: 0.125em 0.5em;
-      cursor: pointer;
-      border: none;
-      border-radius: 2px;
-      & + button {
-        margin-left: 0.5rem;
-      }
-      &:hover {
-        background: #9dc;
-      }
+  button {
+    background: #bee;
+    padding: 0.125em 0.5em;
+    cursor: pointer;
+    border: none;
+    border-radius: 2px;
+    & + button {
+      margin-left: 0.5rem;
+    }
+    &:hover {
+      background: #9dc;
     }
   }
 }
