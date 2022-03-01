@@ -72,6 +72,34 @@ export type TreeDict<Metadata> = Map<TreeKey, Node<TreeKey, Metadata>>;
 export const newTreeDict = <Metadata>() =>
   new Map<TreeKey, Node<TreeKey, Metadata>>();
 
+export const mapMetadata = <Metadata, NewMetadata>(
+  tree: Tree<Metadata>,
+  fn: (metadata: Metadata) => NewMetadata
+): Tree<NewMetadata> => {
+  const goData = (data: Tree<Metadata>["data"]): Tree<NewMetadata>["data"] => {
+    switch (data.type) {
+      case NodeType.Blank:
+      case NodeType.Variable:
+        return data;
+      case NodeType.Abstraction:
+        return { ...data, body: go(data.body) };
+      case NodeType.Application:
+        return {
+          ...data,
+          function: go(data.function),
+          argument: go(data.argument),
+        };
+    }
+  };
+
+  const go = (subtree: Tree<Metadata>): Tree<NewMetadata> => ({
+    data: goData(subtree.data),
+    metadata: fn(subtree.metadata),
+  });
+
+  return go(tree);
+};
+
 export const structure = <Metadata>(
   nodes: TreeDict<Metadata>,
   root: TreeKey
