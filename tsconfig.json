@@ -20,7 +20,12 @@
       "@components/*": ["components/*.vue"],
       "@lib/*": ["lib/*"],
       "@store/*": ["store/*"]
-    }
+    },
+
+    // explicitly specify vite types so that accidental dependencies on react
+    // types by other libs don't mess up IDE checking
+    // <https://github.com/johnsoncodehk/volar/discussions/592>
+    "types": ["vite/client"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }
