@@ -149,15 +149,19 @@ Vue.onUnmounted(() => {});
   }
 }
 
+.node:not(.blank) {
+  padding: 0.25rem 0.75rem;
+}
+
 .node:not(.blank),
 .param {
   background-color: #eee;
   border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.5);
-  padding: 0.5rem;
 }
 .param {
   align-self: start;
+  padding: 0.5rem;
 
   input {
     width: 3rem;
