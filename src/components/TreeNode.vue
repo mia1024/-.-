@@ -3,17 +3,24 @@ import * as Syntax from "../lib/syntax";
 import * as Store from "../store";
 import * as Vue from "vue";
 
-const tree: Vue.Ref<HTMLElement | null> = Vue.ref(null);
-const node: Vue.Ref<HTMLElement | null> = Vue.ref(null);
+const tree = Vue.ref<HTMLElement | null>(null);
+const node = Vue.ref<HTMLElement | null>(null);
+const left = Vue.ref<HTMLElement | null>(null);
 
 const props = defineProps<{
   nodeKey: symbol;
 }>();
 
-const store = Store.store();
+const store = Store.syntax();
+
+//const isRoot = Vue.computed(() => )
 
 // TODO fix unsafe index
-const expr = Vue.computed(() => store.syntax.nodes.get(props.nodeKey)!);
+const expr = Vue.computed(() => {
+  const node = store.nodes.get(props.nodeKey);
+  if (typeof node === "undefined") throw Error("missing node");
+  return node;
+});
 
 const getBox = (elem: HTMLElement) => ({
   left: elem.offsetLeft,
@@ -24,10 +31,10 @@ const getBox = (elem: HTMLElement) => ({
 
 const updateGeometry = () => {
   if (tree.value === null || node.value === null) return;
-
-  store.updateGeometry(props.nodeKey, {
+  store.setGeometry(props.nodeKey, {
     tree: getBox(tree.value),
     node: getBox(node.value),
+    left: left.value === null ? undefined : getBox(left.value),
   });
 };
 
@@ -45,11 +52,19 @@ Vue.onUnmounted(() => {});
 <script></script>
 
 <template>
-  <div class="tree" ref="tree">
+  <div
+    class="tree"
+    :class="{root: store.trail[store.trail.length-1]! === props.nodeKey}"
+    ref="tree"
+  >
     <div class="node-pad">
-      <div class="node" ref="node">
+      <div
+        class="node"
+        :class="{ blank: expr.data.type === Syntax.NodeType.Blank }"
+        ref="node"
+      >
         <button
-          @click="store.clear(nodeKey)"
+          @click="store.prune(nodeKey)"
           class="close"
           v-if="expr.data.type !== Syntax.NodeType.Blank"
         >
@@ -58,9 +73,11 @@ Vue.onUnmounted(() => {});
         <template v-if="expr.data.type === Syntax.NodeType.Blank">
           <div class="hole" />
           <div class="new">
-            <button @click="store.insertVariable(nodeKey)">𝑥</button>
-            <button @click="store.insertAbstraction(nodeKey)">λ</button>
-            <button @click="store.insertApplication(nodeKey)">$</button>
+            <div class="pad">
+              <button @click="store.makeVariable(nodeKey)">𝑥</button>
+              <button @click="store.makeAbstraction(nodeKey)">λ</button>
+              <button @click="store.makeApplication(nodeKey)">$</button>
+            </div>
           </div>
         </template>
         <template v-if="expr.data.type === Syntax.NodeType.Variable">
@@ -76,7 +93,9 @@ Vue.onUnmounted(() => {});
     </div>
     <div class="children">
       <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
-        <div class="param">λ <input v-model="expr.data.parameter" /></div>
+        <div class="param" ref="left">
+          λ <input v-model="expr.data.parameter" />
+        </div>
         <TreeNode :nodeKey="expr.data.body" />
       </template>
       <template v-if="expr.data.type === Syntax.NodeType.Application">
@@ -106,20 +125,47 @@ Vue.onUnmounted(() => {});
   padding: 0;
   margin: -1rem;
   padding: 1rem;
+  margin-bottom: -1.5rem;
+  padding-bottom: 1.5rem;
 
   &:hover {
     .close,
     .new {
       visibility: visible;
     }
+
+    .hole {
+      border-color: red;
+    }
   }
 }
-.node {
-  position: relative;
+
+.tree.root > .node-pad > .node.blank {
+  & > .hole {
+    border-color: red;
+  }
+  & > .new {
+    visibility: visible;
+  }
+}
+
+.node:not(.blank),
+.param {
   background-color: #eee;
   border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.5);
   padding: 0.5rem;
+}
+.param {
+  align-self: start;
+
+  input {
+    width: 3rem;
+  }
+}
+
+.node {
+  position: relative;
 
   .close {
     visibility: hidden;
@@ -159,45 +205,39 @@ Vue.onUnmounted(() => {});
 }
 
 .hole {
-  border: 1px solid gray;
+  border: 1px solid transparent;
   width: 1em;
   height: 1em;
   border-radius: 0.5em;
 }
 .new {
-  visibility: hidden;
   position: absolute;
   display: flex;
-  bottom: 100%;
-  left: 100%;
+  justify-content: center;
+  left: 50%;
+  top: 100%;
+  width: 0;
   z-index: 1;
   flex-direction: row;
   font-size: 0.75em;
-  margin-left: -0.25em;
-  margin-bottom: -0.25em;
+  visibility: hidden;
 
-  button {
-    background: #bee;
-    padding: 0.125em 0.5em;
-    cursor: pointer;
-    border: none;
-    border-radius: 2px;
-    & + button {
-      margin-left: 0.5rem;
+  .pad {
+    display: flex;
+    padding: 0.5rem;
+    button {
+      background: #bee;
+      padding: 0.125em 0.5em;
+      cursor: pointer;
+      border: none;
+      border-radius: 2px;
+      & + button {
+        margin-left: 0.5rem;
+      }
+      &:hover {
+        background: #9dc;
+      }
     }
-    &:hover {
-      background: #9dc;
-    }
-  }
-}
-
-.param {
-  background-color: #eee;
-  padding: 0.5rem;
-  align-self: start;
-
-  input {
-    width: 3rem;
   }
 }
 

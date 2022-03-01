@@ -2,8 +2,8 @@
   <svg>
     <path
       stroke="black"
-      v-for="edge in coords"
-      :d="`M${edge.from.x} ${edge.from.y} L${edge.to.x} ${edge.to.y}`"
+      v-for="edge in edges"
+      :d="`M${edge.parent.x} ${edge.parent.y} L${edge.child.x} ${edge.child.y}`"
     />
   </svg>
 </template>
@@ -13,41 +13,67 @@ import * as Store from "@/store";
 import * as Syntax from "@/lib/syntax";
 import * as Vue from "vue";
 
-const store = Store.store();
+const store = Store.syntax();
 
-const edgeToCoords = (edge: Record<"parent" | "child", symbol>) => {
-  const parent = store.geometry.get(edge.parent);
-  const child = store.geometry.get(edge.child);
-  if (typeof parent === "undefined" || typeof child === "undefined") return [];
+interface Position {
+  x: number;
+  y: number;
+}
 
-  return [
-    {
-      from: {
-        x: parent.node.left + parent.node.width / 2,
-        y: parent.node.top + parent.node.height,
-      },
-      to: { x: child.node.left + child.node.width / 2, y: child.node.top },
-    },
-  ];
-};
+interface Edge {
+  parent: Position;
+  child: Position;
+}
 
-const coords = Vue.computed(() => {
-  const rootKey = store.syntax.trail[store.syntax.trail.length - 1];
-  if (typeof rootKey === "undefined") throw Error("wtf");
+const getCenter = (box: Store.SyntaxStore.BoundingBox): Position => ({
+  x: box.left + box.width / 2,
+  y: box.top + box.height / 2,
+});
 
-  const edges: Record<"parent" | "child", symbol>[] = [];
+const edges = Vue.computed(() => {
+  const rootKey = store.trail[store.trail.length - 1];
+  if (typeof rootKey === "undefined")
+    throw Error("very bad very very bad trail should always be nonempty");
+
+  const edges: Edge[] = [];
   const go = (key: Syntax.TreeKey) => {
-    const node = store.syntax.nodes.get(key);
+    const node = store.nodes.get(key);
     if (typeof node === "undefined") throw Error("edges: missing node");
+    const geom = node.metadata.geometry;
 
     switch (node.data.type) {
       case Syntax.NodeType.Abstraction:
-        edges.push({ parent: key, child: node.data.body });
+        const paramBox = node.metadata.geometry?.left;
+        const bodyGeom = store.nodes.get(node.data.body)?.metadata.geometry;
+        if (typeof geom !== "undefined") {
+          if (typeof paramBox !== "undefined")
+            edges.push({
+              parent: getCenter(geom.node),
+              child: getCenter(paramBox),
+            });
+          if (typeof bodyGeom !== "undefined")
+            edges.push({
+              parent: getCenter(geom.node),
+              child: getCenter(bodyGeom.node),
+            });
+        }
         go(node.data.body);
         break;
       case Syntax.NodeType.Application:
-        edges.push({ parent: key, child: node.data.function });
-        edges.push({ parent: key, child: node.data.argument });
+        const fnGeom = store.nodes.get(node.data.function)?.metadata.geometry;
+        const argGeom = store.nodes.get(node.data.argument)?.metadata.geometry;
+        if (typeof geom !== "undefined") {
+          if (typeof fnGeom !== "undefined")
+            edges.push({
+              parent: getCenter(geom.node),
+              child: getCenter(fnGeom.node),
+            });
+          if (typeof argGeom !== "undefined")
+            edges.push({
+              parent: getCenter(geom.node),
+              child: getCenter(argGeom.node),
+            });
+        }
         go(node.data.function);
         go(node.data.argument);
         break;
@@ -55,7 +81,7 @@ const coords = Vue.computed(() => {
   };
   go(rootKey);
 
-  return edges.flatMap(edgeToCoords);
+  return edges;
 });
 </script>
 

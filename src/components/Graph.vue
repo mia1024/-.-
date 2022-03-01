@@ -1,7 +1,7 @@
 <template>
   <div class="view">
     <Edges />
-    <TreeNode :nodeKey="store.syntax.trail[store.syntax.trail.length-1]!" />
+    <TreeNode :nodeKey="store.trail[store.trail.length-1]!" />
   </div>
 </template>
 
@@ -9,7 +9,10 @@
 import TreeNode from "@components/TreeNode";
 import Edges from "@components/Edges";
 import * as Store from "@/store";
-const store = Store.store();
+//import * as Syntax from "@lib/syntax";
+const store = Store.syntax();
+
+//const root = store.nodes.get(store.trail[store.trail.length-1]!)!
 </script>
 
 <style scoped lang="scss">

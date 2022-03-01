@@ -5,14 +5,15 @@ export const enum NodeType {
   Blank,
 }
 
-// We parametrize `Node` by the `Subtree` type to conveniently enable
-// both the structured and flattened tree representations.  The structured
+// We parametrize `Node` by the `Subtree` type to conveniently enable both the
+// structured and flattened tree representations.  The structured
 // representation (subnodes are stored directly as nested `Node`s) is
 // self-contained and a simpler/nicer data representation, but the flattened
 // representation (subnodes are stored as references via TreeKeys/IDs
 // corresponding to keys in a dictionary) is more well-adapted to encoding UI
-// state.
-export interface Node<Subtree> {
+// state.  The `Metadata` type parameter is used to store UI-related data, e.g.
+// window coordinates for drawing edges, row/col numbers in code editor, etc.
+export interface Node<Subtree, Metadata> {
   data:
     | { type: NodeType.Blank }
     | { type: NodeType.Variable; name: string }
@@ -26,46 +27,68 @@ export interface Node<Subtree> {
         function: Subtree;
         argument: Subtree;
       };
+  metadata: Metadata;
 }
 
-export const blank = <Subtree>(): Node<Subtree> => ({
+export const blank = <Subtree, Metadata>(
+  metadata: Metadata
+): Node<Subtree, Metadata> => ({
   data: { type: NodeType.Blank },
+  metadata,
 });
-export const variable = <Subtree>(name: string): Node<Subtree> => ({
+export const variable = <Subtree, Metadata>(
+  name: string,
+  metadata: Metadata
+): Node<Subtree, Metadata> => ({
   data: { type: NodeType.Variable, name },
+  metadata,
 });
-export const abstraction = <Subtree>(
+export const abstraction = <Subtree, Metadata>(
   parameter: string,
-  body: Subtree
-): Node<Subtree> => ({ data: { type: NodeType.Abstraction, parameter, body } });
+  body: Subtree,
+  metadata: Metadata
+): Node<Subtree, Metadata> => ({
+  data: { type: NodeType.Abstraction, parameter, body },
+  metadata,
+});
 
-export const application = <Subtree>(
+export const application = <Subtree, Metadata>(
   fn: Subtree,
-  argument: Subtree
-): Node<Subtree> => ({
+  argument: Subtree,
+  metadata: Metadata
+): Node<Subtree, Metadata> => ({
   data: { type: NodeType.Application, function: fn, argument },
+  metadata,
 });
 
 // structured representation
-export type Tree = Node<Tree>;
+export type Tree<Metadata> = Node<Tree<Metadata>, Metadata>;
 
 // flattened representation
 export type TreeKey = symbol; // feeling cute, might change later
 export const newTreeKey = (): TreeKey => Symbol();
 
-export type TreeDict = Map<TreeKey, Node<TreeKey>>;
-export const newTreeDict = () => new Map<TreeKey, Node<TreeKey>>();
+export type TreeDict<Metadata> = Map<TreeKey, Node<TreeKey, Metadata>>;
+export const newTreeDict = <Metadata>() =>
+  new Map<TreeKey, Node<TreeKey, Metadata>>();
 
-export const structure = (nodes: TreeDict, root: TreeKey): Tree => {
+export const structure = <Metadata>(
+  nodes: TreeDict<Metadata>,
+  root: TreeKey
+): Tree<Metadata> => {
   const node = nodes.get(root);
   if (typeof node === "undefined") throw new Error("missing subtree root");
 
+  // TODO refactor into `structureData` helper but it's ok for now
   switch (node.data.type) {
     case NodeType.Blank:
     case NodeType.Variable:
-      return { data: node.data };
+      // TS not smart enough to directly narrow type of `node`, so we have to
+      // write out each key individually
+      return { data: node.data, metadata: node.metadata };
     case NodeType.Abstraction:
       return {
+        metadata: node.metadata,
         data: {
           ...node.data,
           body: structure(nodes, node.data.body),
@@ -73,6 +96,7 @@ export const structure = (nodes: TreeDict, root: TreeKey): Tree => {
       };
     case NodeType.Application:
       return {
+        metadata: node.metadata,
         data: {
           ...node.data,
           function: structure(nodes, node.data.function),
@@ -82,38 +106,40 @@ export const structure = (nodes: TreeDict, root: TreeKey): Tree => {
   }
 };
 
-export const flatten = (tree: Tree): { nodes: TreeDict; root: TreeKey } => {
-  const nodes = treeDict();
+export const flatten = <Metadata>(
+  tree: Tree<Metadata>
+): { nodes: TreeDict<Metadata>; root: TreeKey } => {
+  const nodes = newTreeDict<Metadata>();
 
-  const go = (subtree: Tree): TreeKey => {
-    const key = Symbol();
-    switch (subtree.data.type) {
+  const flattenData = (data: Tree<Metadata>["data"]) => {
+    switch (data.type) {
       case NodeType.Blank:
       case NodeType.Variable:
-        nodes.set(key, { data: subtree.data });
-        break;
+        return data;
       case NodeType.Abstraction:
-        nodes.set(key, {
-          data: { ...subtree.data, body: go(subtree.data.body) },
-        });
-        break;
+        return { ...data, body: flattenSubtree(data.body) };
       case NodeType.Application:
-        nodes.set(key, {
-          data: {
-            ...subtree.data,
-            function: go(subtree.data.function),
-            argument: go(subtree.data.argument),
-          },
-        });
-        break;
+        return {
+          ...data,
+          function: flattenSubtree(data.function),
+          argument: flattenSubtree(data.argument),
+        };
     }
+  };
+
+  const flattenSubtree = (subtree: Tree<Metadata>): TreeKey => {
+    const key = Symbol();
+    nodes.set(key, {
+      metadata: subtree.metadata,
+      data: flattenData(subtree.data),
+    });
     return key;
   };
 
-  return { nodes, root: go(tree) };
+  return { nodes, root: flattenSubtree(tree) };
 };
 
-export const stringifyCompact = (expr: Tree): string => {
+export const stringifyCompact = <Metadata>(expr: Tree<Metadata>): string => {
   switch (expr.data.type) {
     case NodeType.Blank:
       return "_";

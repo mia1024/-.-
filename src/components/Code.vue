@@ -7,11 +7,11 @@ import * as Store from "@/store";
 import * as Syntax from "@/lib/syntax";
 import * as Vue from "vue";
 
-const store = Store.store();
+const store = Store.syntax();
 
 const code = Vue.computed(() => {
-  const root = store.syntax.trail[store.syntax.trail.length - 1]!;
-  const tree = Syntax.structure(store.syntax.nodes, root);
+  const root = store.trail[store.trail.length - 1]!;
+  const tree = Syntax.structure(store.nodes, root);
   return Syntax.stringifyCompact(tree);
 });
 </script>
