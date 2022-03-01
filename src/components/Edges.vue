@@ -42,7 +42,7 @@ const edges = Vue.computed(() => {
     const geom = node.metadata.geometry;
 
     switch (node.data.type) {
-      case Syntax.NodeType.Abstraction:
+      case Syntax.Node.NodeType.Abstraction:
         const paramBox = node.metadata.geometry?.left;
         const bodyGeom = store.nodes.get(node.data.body)?.metadata.geometry;
         if (typeof geom !== "undefined") {
@@ -59,7 +59,7 @@ const edges = Vue.computed(() => {
         }
         go(node.data.body);
         break;
-      case Syntax.NodeType.Application:
+      case Syntax.Node.NodeType.Application:
         const fnGeom = store.nodes.get(node.data.function)?.metadata.geometry;
         const argGeom = store.nodes.get(node.data.argument)?.metadata.geometry;
         if (typeof geom !== "undefined") {

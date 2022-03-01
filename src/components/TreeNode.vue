@@ -60,17 +60,17 @@ Vue.onUnmounted(() => {});
     <div class="node-pad">
       <div
         class="node"
-        :class="{ blank: expr.data.type === Syntax.NodeType.Blank }"
+        :class="{ blank: expr.data.type === Syntax.Node.NodeType.Blank }"
         ref="node"
       >
         <button
           @click="store.prune(nodeKey)"
           class="close"
-          v-if="expr.data.type !== Syntax.NodeType.Blank"
+          v-if="expr.data.type !== Syntax.Node.NodeType.Blank"
         >
           ×
         </button>
-        <template v-if="expr.data.type === Syntax.NodeType.Blank">
+        <template v-if="expr.data.type === Syntax.Node.NodeType.Blank">
           <div class="hole" />
           <div class="new">
             <div class="pad">
@@ -80,25 +80,25 @@ Vue.onUnmounted(() => {});
             </div>
           </div>
         </template>
-        <template v-if="expr.data.type === Syntax.NodeType.Variable">
+        <template v-if="expr.data.type === Syntax.Node.NodeType.Variable">
           <input class="var" v-model="expr.data.name" />
         </template>
-        <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
+        <template v-if="expr.data.type === Syntax.Node.NodeType.Abstraction">
           λ
         </template>
-        <template v-if="expr.data.type === Syntax.NodeType.Application">
+        <template v-if="expr.data.type === Syntax.Node.NodeType.Application">
           $
         </template>
       </div>
     </div>
     <div class="children">
-      <template v-if="expr.data.type === Syntax.NodeType.Abstraction">
+      <template v-if="expr.data.type === Syntax.Node.NodeType.Abstraction">
         <div class="param" ref="left">
           λ <input v-model="expr.data.parameter" />
         </div>
         <TreeNode :nodeKey="expr.data.body" />
       </template>
-      <template v-if="expr.data.type === Syntax.NodeType.Application">
+      <template v-if="expr.data.type === Syntax.Node.NodeType.Application">
         <TreeNode :nodeKey="expr.data.function" />
         <TreeNode :nodeKey="expr.data.argument" />
       </template>

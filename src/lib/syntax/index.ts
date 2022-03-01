@@ -1,2 +1,2 @@
-export { Node, NodeType } from "./node";
+export * as Node from "./node";
 export * from "./tree";

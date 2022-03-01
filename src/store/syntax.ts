@@ -32,27 +32,27 @@ export const store = Pinia.defineStore("syntax", {
   state: (): State => {
     const root = Symbol();
     const nodes = Syntax.newTreeDict<Metadata>();
-    nodes.set(root, Syntax.blank({}));
+    nodes.set(root, Syntax.Node.blank({}));
     return { nodes, trail: [root], stamp: Symbol() };
   },
   actions: {
     newBlank() {
       const key = Syntax.newTreeKey();
-      this.nodes.set(key, Syntax.blank({}));
+      this.nodes.set(key, Syntax.Node.blank({}));
       return key;
     },
     makeVariable(key: Syntax.TreeKey) {
-      this.nodes.set(key, Syntax.variable("x", {}));
+      this.nodes.set(key, Syntax.Node.variable("x", {}));
       this.stamp = Symbol();
     },
     makeAbstraction(key: Syntax.TreeKey) {
-      this.nodes.set(key, Syntax.abstraction("x", this.newBlank(), {}));
+      this.nodes.set(key, Syntax.Node.abstraction("x", this.newBlank(), {}));
       this.stamp = Symbol();
     },
     makeApplication(key: Syntax.TreeKey) {
       this.nodes.set(
         key,
-        Syntax.application(this.newBlank(), this.newBlank(), {})
+        Syntax.Node.application(this.newBlank(), this.newBlank(), {})
       );
       this.stamp = Symbol();
     },
@@ -68,16 +68,16 @@ export const store = Pinia.defineStore("syntax", {
         if (typeof node === "undefined") throw Error("prune root missing");
 
         switch (node.data.type) {
-          case Syntax.NodeType.Abstraction:
+          case Syntax.Node.NodeType.Abstraction:
             go(node.data.body);
             break;
-          case Syntax.NodeType.Application:
+          case Syntax.Node.NodeType.Application:
             go(node.data.function);
             go(node.data.argument);
             break;
         }
 
-        node.data = { type: Syntax.NodeType.Blank };
+        node.data = { type: Syntax.Node.NodeType.Blank };
       };
 
       go(key);
