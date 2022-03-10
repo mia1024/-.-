@@ -1,6 +1,5 @@
 import * as Pinia from "pinia";
 import * as Syntax from "../lib/syntax";
-import * as SyntaxState from "../lib/state";
 
 export * as SyntaxStore from "./syntax";
 
