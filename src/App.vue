@@ -26,6 +26,8 @@ const store = Store.store();
 </script>
 
 <style scoped lang="scss">
+@use "@/scss/colors";
+
 .main {
   display: flex;
   height: 100vh;
@@ -33,7 +35,7 @@ const store = Store.store();
   .graph-view {
     flex-basis: 0;
     flex-grow: 2;
-    border-right: 1px solid #c0c0c0;
+    border-right: 1px solid transparentize(colors.$foreground,0.3);
   }
 
   .right-side-wrapper {
@@ -45,7 +47,7 @@ const store = Store.store();
     .library-view {
       flex-basis: 0;
       flex-grow: 2;
-      border-bottom: 1px solid #c0c0c0;
+      border-bottom: 1px solid transparentize(colors.$foreground,0.3);
     }
     .code-view {
       flex-basis: 0;

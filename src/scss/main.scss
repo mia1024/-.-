@@ -1,1 +1,13 @@
 @use "reset";
+@use "colors";
+@use "fonts";
+
+body{
+  color: colors.$foreground;
+  background-color: colors.$background;
+  font-family: fonts.$sansSerif;
+}
+
+pre,code{
+  font-family: fonts.$monospace;
+}

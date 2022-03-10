@@ -1,0 +1,41 @@
+$font-weights:(
+        "Thin":100,
+        "Light":300,
+        "Medium":500,
+        "Bold":700,
+);
+
+@font-face {
+  font-family: JetBrainsMono;
+  src: url("@/assets/JetBrainsMono-Regular.woff2");
+}
+
+@each $name,$weight in $font-weights{
+  @font-face {
+    font-family: JetBrainsMono;
+    font-weight: $weight;
+    src: url("@/assets/JetBrainsMono-#{$name}.woff2");
+  }
+
+  @font-face {
+    font-family: JetBrainsMono;
+    font-weight: $weight;
+    font-style: italic;
+    src: url("@/assets/JetBrainsMono-#{$name}Italic.woff2");
+  }
+}
+
+@font-face {
+  font-family: "Helvetica Now";
+  font-weight: normal;
+  src: url("@/assets/Helvetica-Now-Regular.otf");
+}
+
+@font-face {
+  font-family: "Helvetica Now";
+  font-weight: bold;
+  src: url("@/assets/Helvetica-Now-Bold.otf");
+}
+
+$monospace: "JetBrainsMono", monospace;
+$sansSerif: "Helvetica Now", sans-serif;
