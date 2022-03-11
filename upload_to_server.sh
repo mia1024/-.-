@@ -6,12 +6,9 @@ print(){
   printf "$1"
   printf "\033[0m"
 }
+
 print "Typechecking..."
 yarn typecheck > /dev/null
-print "Done\n"
-
-print "Compiling..."
-yarn build > /dev/null
 print "Done\n"
 
 if [[ -z "$HMC_USERNAME" ]]; then
@@ -20,6 +17,12 @@ if [[ -z "$HMC_USERNAME" ]]; then
 else
   username=$HMC_USERNAME
 fi
+
+print "Compiling..."
+yarn build --base="/~$username/lambda/" > /dev/null
+print "Done\n"
+
+
 
 print "Uploading..."
 rsync -rua --delete dist/ "$username@cs.hmc.edu:~/public_html/lambda/"
