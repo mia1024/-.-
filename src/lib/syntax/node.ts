@@ -1,8 +1,8 @@
 export const enum NodeType {
-  Variable,
-  Abstraction,
-  Application,
-  Blank,
+    Variable,
+    Abstraction,
+    Application,
+    Blank,
 }
 
 // We parametrize `Node` by the `Subtree` type to conveniently enable both the
@@ -14,49 +14,59 @@ export const enum NodeType {
 // state.  The `Metadata` type parameter is used to store UI-related data, e.g.
 // window coordinates for drawing edges, row/col numbers in code editor, etc.
 export interface Node<Subtree, Metadata> {
-  data:
-    | { type: NodeType.Blank }
-    | { type: NodeType.Variable; name: string }
-    | {
+    data:
+        | { type: NodeType.Blank }
+        | { type: NodeType.Variable; name: string }
+        | {
         type: NodeType.Abstraction;
         parameter: string;
         body: Subtree;
-      }
-    | {
+    }
+        | {
         type: NodeType.Application;
         function: Subtree;
         argument: Subtree;
-      };
-  metadata: Metadata;
+    };
+    metadata: Metadata;
 }
 
-export const blank = <Subtree, Metadata>(
-  metadata: Metadata
-): Node<Subtree, Metadata> => ({
-  data: { type: NodeType.Blank },
-  metadata,
-});
-export const variable = <Subtree, Metadata>(
-  name: string,
-  metadata: Metadata
-): Node<Subtree, Metadata> => ({
-  data: { type: NodeType.Variable, name },
-  metadata,
-});
-export const abstraction = <Subtree, Metadata>(
-  parameter: string,
-  body: Subtree,
-  metadata: Metadata
-): Node<Subtree, Metadata> => ({
-  data: { type: NodeType.Abstraction, parameter, body },
-  metadata,
-});
+export function blank<Subtree, Metadata>(
+    metadata: Metadata
+): Node<Subtree, Metadata> {
+    return {
+        data: {type: NodeType.Blank},
+        metadata,
+    }
+}
 
-export const application = <Subtree, Metadata>(
-  fn: Subtree,
-  argument: Subtree,
-  metadata: Metadata
-): Node<Subtree, Metadata> => ({
-  data: { type: NodeType.Application, function: fn, argument },
-  metadata,
-});
+export function variable<Subtree, Metadata>(
+    name: string,
+    metadata: Metadata
+): Node<Subtree, Metadata> {
+    return {
+        data: {type: NodeType.Variable, name},
+        metadata
+    }
+}
+
+export function abstraction<Subtree, Metadata>(
+    parameter: string,
+    body: Subtree,
+    metadata: Metadata
+): Node<Subtree, Metadata> {
+    return {
+        data: {type: NodeType.Abstraction, parameter, body},
+        metadata,
+    }
+}
+
+export function application<Subtree, Metadata>(
+    fn: Subtree,
+    argument: Subtree,
+    metadata: Metadata
+): Node<Subtree, Metadata> {
+    return {
+        data: {type: NodeType.Application, function: fn, argument},
+        metadata,
+    }
+}
