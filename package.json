@@ -2,7 +2,8 @@
   "scripts": {
     "serve": "vite serve",
     "build": "vite build",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "upload": "./script/upload.bash"
   },
   "name": "lambda",
   "version": "0.0.1",
