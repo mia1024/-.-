@@ -1,55 +1,85 @@
 <template>
     <div
-            class="tree"
-            :class="{root: store.trail[store.trail.length-1]! === props.nodeKey}"
-            ref="tree"
-            @mouseenter="setHover"
-            @mouseleave="removeHover"
+        class="tree"
+        :class="{root: store.trail[store.trail.length-1]! === props.nodeKey}"
+        ref="tree"
+        @mouseenter="setHover"
+        @mouseleave="removeHover"
     >
         <div class="node-pad">
             <div
-                    class="node"
-                    :class="{ blank: expr.data.type === Syntax.Node.NodeType.Blank }"
-                    ref="node"
+                class="node"
+                :class="{
+                    blank: expr.data.type === Syntax.Node.NodeType.Blank,
+                }"
+                ref="node"
             >
                 <button
-                        @click="store.prune(nodeKey)"
-                        class="close"
-                        v-if="expr.data.type !== Syntax.Node.NodeType.Blank"
+                    @click="store.prune(nodeKey)"
+                    class="close"
+                    v-if="expr.data.type !== Syntax.Node.NodeType.Blank"
                 >
                     ×
                 </button>
                 <template v-if="expr.data.type === Syntax.Node.NodeType.Blank">
-                    <div class="hole"/>
+                    <div class="hole" />
                     <div class="new">
                         <div class="pad">
-                            <button @click="store.makeVariable(nodeKey)">𝑥</button>
-                            <button @click="store.makeAbstraction(nodeKey)">λ</button>
-                            <button @click="store.makeApplication(nodeKey)">$</button>
+                            <button @click="store.makeVariable(nodeKey)">
+                                𝑥
+                            </button>
+                            <button @click="store.makeAbstraction(nodeKey)">
+                                λ
+                            </button>
+                            <button @click="store.makeApplication(nodeKey)">
+                                $
+                            </button>
                         </div>
                     </div>
                 </template>
-                <template v-if="expr.data.type === Syntax.Node.NodeType.Variable">
-                    <input class="var" v-model="expr.data.name"/>
+                <template
+                    v-if="expr.data.type === Syntax.Node.NodeType.Variable"
+                >
+                    <input class="var" v-model="expr.data.name" />
                 </template>
-                <template v-if="expr.data.type === Syntax.Node.NodeType.Abstraction">
+                <template
+                    v-if="expr.data.type === Syntax.Node.NodeType.Abstraction"
+                >
                     λ
                 </template>
-                <template v-if="expr.data.type === Syntax.Node.NodeType.Application">
+                <template
+                    v-if="expr.data.type === Syntax.Node.NodeType.Application"
+                >
                     $
                 </template>
             </div>
         </div>
         <div class="children">
-            <template v-if="expr.data.type === Syntax.Node.NodeType.Abstraction">
+            <template
+                v-if="expr.data.type === Syntax.Node.NodeType.Abstraction"
+            >
                 <div class="param" ref="left">
-                    λ <input v-model="expr.data.parameter"/>
+                    λ <input v-model="expr.data.parameter" />
                 </div>
-                <TreeNode :nodeKey="expr.data.body" @mouseenter="removeHover" @mouseleave="setHover"/>
+                <TreeNode
+                    :nodeKey="expr.data.body"
+                    @mouseenter="removeHover"
+                    @mouseleave="setHover"
+                />
             </template>
-            <template v-if="expr.data.type === Syntax.Node.NodeType.Application">
-                <TreeNode :nodeKey="expr.data.function" @mouseenter="removeHover" @mouseleave="setHover"/>
-                <TreeNode :nodeKey="expr.data.argument" @mouseenter="removeHover" @mouseleave="setHover"/>
+            <template
+                v-if="expr.data.type === Syntax.Node.NodeType.Application"
+            >
+                <TreeNode
+                    :nodeKey="expr.data.function"
+                    @mouseenter="removeHover"
+                    @mouseleave="setHover"
+                />
+                <TreeNode
+                    :nodeKey="expr.data.argument"
+                    @mouseenter="removeHover"
+                    @mouseleave="setHover"
+                />
             </template>
         </div>
     </div>
@@ -64,7 +94,6 @@ const tree = Vue.ref<HTMLElement | null>(null);
 const node = Vue.ref<HTMLElement | null>(null);
 const left = Vue.ref<HTMLElement | null>(null);
 const isHovering = Vue.ref<boolean>(false);
-
 
 const props = defineProps<{
     nodeKey: symbol;
@@ -104,31 +133,29 @@ function removeNodeOnDelete(e: KeyboardEvent) {
 }
 
 Vue.watch(
-        () => store.stamp,
-        () => Vue.nextTick(updateGeometry)
+    () => store.stamp,
+    () => Vue.nextTick(updateGeometry),
 );
 Vue.onMounted(() => {
     updateGeometry();
     window.addEventListener("resize", updateGeometry);
-    window.addEventListener("keydown", removeNodeOnDelete)
+    window.addEventListener("keydown", removeNodeOnDelete);
 });
 Vue.onUnmounted(() => {
-    window.removeEventListener("resize", updateGeometry)
-    window.removeEventListener("keydown", removeNodeOnDelete)
+    window.removeEventListener("resize", updateGeometry);
+    window.removeEventListener("keydown", removeNodeOnDelete);
 });
 
 function setHover() {
     isHovering.value = true;
-    tree.value?.classList.add("hover")
+    tree.value?.classList.add("hover");
 }
 
 function removeHover() {
     isHovering.value = false;
-    tree.value?.classList.remove("hover")
+    tree.value?.classList.remove("hover");
 }
 </script>
-
-<script></script>
 
 <style scoped lang="scss">
 @use "@/scss/colors";
@@ -148,7 +175,6 @@ function removeHover() {
 
     &.hover {
         border: 2px dashed colors.$secondaryLight;
-
     }
 }
 
