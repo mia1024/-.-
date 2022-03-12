@@ -33,12 +33,19 @@ function handleKey(ev: KeyboardEvent) {
         store.prune(store.focus);
 }
 
+function warnBeforeLeave(e: BeforeUnloadEvent) {
+    e.preventDefault();
+    e.returnValue = "";
+}
+
 Vue.onMounted(() => {
     window.addEventListener("keydown", handleKey);
+    window.addEventListener("beforeunload", warnBeforeLeave);
 });
 
 Vue.onUnmounted(() => {
     window.removeEventListener("keydown", handleKey);
+    window.removeEventListener("beforeunload", warnBeforeLeave);
 });
 </script>
 
@@ -66,6 +73,7 @@ Vue.onUnmounted(() => {
             flex-grow: 2;
             border-bottom: 1px solid transparentize(colors.$foreground, 0.3);
         }
+
         .code-view {
             flex-basis: 0;
             flex-grow: 1;
