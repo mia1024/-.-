@@ -18,55 +18,55 @@ export interface Node<Subtree, Metadata> {
         | { type: NodeType.Blank }
         | { type: NodeType.Variable; name: string }
         | {
-        type: NodeType.Abstraction;
-        parameter: string;
-        body: Subtree;
-    }
+              type: NodeType.Abstraction;
+              parameter: string;
+              body: Subtree;
+          }
         | {
-        type: NodeType.Application;
-        function: Subtree;
-        argument: Subtree;
-    };
+              type: NodeType.Application;
+              function: Subtree;
+              argument: Subtree;
+          };
     metadata: Metadata;
 }
 
 export function blank<Subtree, Metadata>(
-    metadata: Metadata
+    metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: {type: NodeType.Blank},
+        data: { type: NodeType.Blank },
         metadata,
-    }
+    };
 }
 
 export function variable<Subtree, Metadata>(
     name: string,
-    metadata: Metadata
+    metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: {type: NodeType.Variable, name},
-        metadata
-    }
+        data: { type: NodeType.Variable, name },
+        metadata,
+    };
 }
 
 export function abstraction<Subtree, Metadata>(
     parameter: string,
     body: Subtree,
-    metadata: Metadata
+    metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: {type: NodeType.Abstraction, parameter, body},
+        data: { type: NodeType.Abstraction, parameter, body },
         metadata,
-    }
+    };
 }
 
 export function application<Subtree, Metadata>(
     fn: Subtree,
     argument: Subtree,
-    metadata: Metadata
+    metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: {type: NodeType.Application, function: fn, argument},
+        data: { type: NodeType.Application, function: fn, argument },
         metadata,
-    }
+    };
 }
