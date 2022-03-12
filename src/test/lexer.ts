@@ -71,5 +71,7 @@ Tap.test("lexer", (t) => {
         t.end();
     });
 
+    // TODO test positions
+
     t.end();
 });
