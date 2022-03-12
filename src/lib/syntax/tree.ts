@@ -117,13 +117,6 @@ export const stringifyCompact = <Metadata>(expr: Tree<Metadata>): string => {
     case NodeType.Application:
       const arg = stringifyCompact(expr.data.argument);
       const fn = stringifyCompact(expr.data.function);
-      const parenFn =
-        expr.data.function.data.type === NodeType.Abstraction ? `(${fn})` : fn;
-      const parenArg =
-        expr.data.argument.data.type === NodeType.Abstraction ||
-        expr.data.argument.data.type === NodeType.Application
-          ? `(${arg})`
-          : arg;
-      return `(${parenFn} ${parenArg})`;
+      return `(${arg} ${fn})`;
   }
 };
