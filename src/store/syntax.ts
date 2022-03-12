@@ -4,6 +4,7 @@ import * as Syntax from "@lib/syntax";
 export interface State {
     nodes: Syntax.TreeDict<Metadata>;
     trail: Syntax.TreeKey[];
+    focus: Syntax.TreeKey | null;
 
     // updated each time tree structure is modified; useful for triggering
     // DOM-layout detection reupdates via `watch`.  maybe we can use
@@ -33,7 +34,12 @@ export const store = Pinia.defineStore("syntax", {
         const root = Symbol();
         const nodes = Syntax.newTreeDict<Metadata>();
         nodes.set(root, Syntax.Node.blank({}));
-        return { nodes, trail: [root], stamp: Symbol() };
+        return {
+            nodes,
+            trail: [root],
+            focus: null,
+            stamp: Symbol(),
+        };
     },
     actions: {
         newBlank() {

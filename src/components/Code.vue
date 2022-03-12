@@ -1,5 +1,5 @@
 <template>
-  <pre>{{ code }}</pre>
+  <textarea v-model="code"></textarea>
 </template>
 
 <script lang="ts" setup>

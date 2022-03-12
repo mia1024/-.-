@@ -1,7 +1,7 @@
 <template>
     <div
         class="tree"
-        :class="{root: store.trail[store.trail.length-1]! === props.nodeKey}"
+        :class="{ root: isRoot, hover: isHover }"
         ref="tree"
         @mouseenter="setHover"
         @mouseleave="removeHover"
@@ -93,13 +93,18 @@ import * as Vue from "vue";
 const tree = Vue.ref<HTMLElement | null>(null);
 const node = Vue.ref<HTMLElement | null>(null);
 const left = Vue.ref<HTMLElement | null>(null);
-const isHovering = Vue.ref<boolean>(false);
+//const isHovering = Vue.ref<boolean>(false);
 
 const props = defineProps<{
     nodeKey: symbol;
 }>();
 
 const store = Store.syntax();
+
+const isRoot = Vue.computed(
+    () => store.trail[store.trail.length - 1]! === props.nodeKey,
+);
+const isHover = Vue.computed(() => store.focus === props.nodeKey);
 
 //const isRoot = Vue.computed(() => )
 
@@ -126,12 +131,8 @@ const updateGeometry = () => {
     });
 };
 
-function removeNodeOnDelete(e: KeyboardEvent) {
-    if (isHovering.value)
-        if (e.code === "Delete" || e.code === "Backspace")
-            store.prune(props.nodeKey);
-}
-
+// every time tree structure updates (as reflected by `stamp`), re-trigger
+// geometry detection after next render tick
 Vue.watch(
     () => store.stamp,
     () => Vue.nextTick(updateGeometry),
@@ -139,21 +140,17 @@ Vue.watch(
 Vue.onMounted(() => {
     updateGeometry();
     window.addEventListener("resize", updateGeometry);
-    window.addEventListener("keydown", removeNodeOnDelete);
 });
 Vue.onUnmounted(() => {
     window.removeEventListener("resize", updateGeometry);
-    window.removeEventListener("keydown", removeNodeOnDelete);
 });
 
 function setHover() {
-    isHovering.value = true;
-    tree.value?.classList.add("hover");
+    store.focus = props.nodeKey;
 }
 
 function removeHover() {
-    isHovering.value = false;
-    tree.value?.classList.remove("hover");
+    if (store.focus === props.nodeKey) store.focus = null;
 }
 </script>
 
