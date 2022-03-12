@@ -15,7 +15,7 @@ export interface Definition {
 export const definitions: Definition[] = [
     { tag: Tag.ParenL, pattern: /\(/ },
     { tag: Tag.ParenR, pattern: /\)/ },
-    { tag: Tag.Hole, pattern: /_/ },
+    { tag: Tag.Hole, pattern: /_|○/ },
     { tag: Tag.Dot, pattern: /\./ },
     { tag: Tag.Lambda, pattern: /\\|λ/ },
     { tag: Tag.Identifier, pattern: /[A-Za-z_]\w*/ },

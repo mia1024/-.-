@@ -23,6 +23,35 @@ Tap.test("lexer", (t) => {
                     { tag: Token.Tag.ParenR, text: ")" },
                 ],
             },
+            {
+                input: "λa○bc _",
+                tokens: [
+                    { tag: Token.Tag.Lambda, text: "λ" },
+                    { tag: Token.Tag.Identifier, text: "a" },
+                    { tag: Token.Tag.Hole, text: "○" },
+                    { tag: Token.Tag.Identifier, text: "bc" },
+                    { tag: Token.Tag.Hole, text: "_" },
+                ],
+            },
+            {
+                input: "\\x. x y(\\z.(zy)x)",
+                tokens: [
+                    { tag: Token.Tag.Lambda, text: "\\" },
+                    { tag: Token.Tag.Identifier, text: "x" },
+                    { tag: Token.Tag.Dot, text: "." },
+                    { tag: Token.Tag.Identifier, text: "x" },
+                    { tag: Token.Tag.Identifier, text: "y" },
+                    { tag: Token.Tag.ParenL, text: "(" },
+                    { tag: Token.Tag.Lambda, text: "\\" },
+                    { tag: Token.Tag.Identifier, text: "z" },
+                    { tag: Token.Tag.Dot, text: "." },
+                    { tag: Token.Tag.ParenL, text: "(" },
+                    { tag: Token.Tag.Identifier, text: "zy" },
+                    { tag: Token.Tag.ParenR, text: ")" },
+                    { tag: Token.Tag.Identifier, text: "x" },
+                    { tag: Token.Tag.ParenR, text: ")" },
+                ],
+            },
         ];
 
         for (const c of cases) {
@@ -37,9 +66,9 @@ Tap.test("lexer", (t) => {
                 })),
                 c.tokens,
             );
-
-            t.end();
         }
+
+        t.end();
     });
 
     t.end();
