@@ -1,32 +1,33 @@
 {
-  "scripts": {
-    "serve": "vite serve",
-    "build": "vite build",
-    "typecheck": "vue-tsc --noEmit",
-    "upload": "./script/upload.bash"
-  },
-  "name": "lambda",
-  "version": "0.0.1",
-  "main": "index.ts",
-  "repository": "git@github.com:mia1024/-.-.git",
-  "author": "Mia Celeste <mia@miaceleste.dev>, Kye Shi <kwshi@hmc.edu>",
-  "license": "GPL-3.0-only",
-  "private": false,
-  "type": "module",
-  "devDependencies": {
-    "@types/node": "^17.0.17",
-    "@types/tap": "^15.0.6",
-    "@vitejs/plugin-vue": "^2.2.0",
-    "@vue/compiler-sfc": "^3.2.31",
-    "dexie": "^3.2.0",
-    "pinia": "^2.0.11",
-    "sass": "^1.49.7",
-    "tap": "^15.1.6",
-    "ts-node": "^10.5.0",
-    "typescript": "^4.5.5",
-    "vite": "^2.8.1",
-    "vue": "^3.2.31",
-    "vue-tsc": "^0.31.3",
-    "vuex": "^4.0.2"
-  }
+    "scripts": {
+        "serve": "vite serve",
+        "build": "vite build",
+        "typecheck": "vue-tsc --noEmit",
+        "upload": "./script/upload.bash",
+        "test": "tap"
+    },
+    "name": "lambda",
+    "version": "0.0.1",
+    "main": "index.ts",
+    "repository": "git@github.com:mia1024/-.-.git",
+    "author": "Mia Celeste <mia@miaceleste.dev>, Kye Shi <kwshi@hmc.edu>",
+    "license": "GPL-3.0-only",
+    "private": false,
+    "type": "module",
+    "devDependencies": {
+        "@types/node": "^17.0.17",
+        "@types/tap": "^15.0.6",
+        "@vitejs/plugin-vue": "^2.2.0",
+        "@vue/compiler-sfc": "^3.2.31",
+        "dexie": "^3.2.0",
+        "pinia": "^2.0.11",
+        "sass": "^1.49.7",
+        "tap": "^15.1.6",
+        "ts-node": "^10.5.0",
+        "typescript": "^4.5.5",
+        "vite": "^2.8.1",
+        "vue": "^3.2.31",
+        "vue-tsc": "^0.31.3",
+        "vuex": "^4.0.2"
+    }
 }
