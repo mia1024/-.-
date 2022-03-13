@@ -9,7 +9,7 @@ export type LexResult =
     | { ok: false; errors: readonly LexError[] };
 
 export const lex = (input: string): LexResult => {
-    const pos: Token.Position = { index: 0, row: 0, col: 0 };
+    const pos = { index: 0, row: 0, col: 0 };
     const tokens: Token.Token[] = [];
     const errors: LexError[] = [];
 
@@ -28,7 +28,7 @@ export const lex = (input: string): LexResult => {
             pos.row += lines.length - 1;
             pos.col = lines[lines.length - 1]!.length;
 
-            const end = { ...pos };
+            const end: Token.Position = { ...pos };
 
             if (def.tag !== null)
                 tokens.push({

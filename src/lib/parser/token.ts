@@ -8,11 +8,11 @@ export const enum Tag {
 }
 
 export interface Definition {
-    tag: Tag | null;
-    pattern: RegExp;
+    readonly tag: Tag | null;
+    readonly pattern: RegExp;
 }
 
-export const definitions: Definition[] = [
+export const definitions: readonly Definition[] = [
     { tag: Tag.ParenL, pattern: /\(/ },
     { tag: Tag.ParenR, pattern: /\)/ },
     { tag: Tag.Hole, pattern: /_|○/ },
@@ -24,18 +24,18 @@ export const definitions: Definition[] = [
 
 // TODO make syntax metadata
 export interface Position {
-    index: number;
-    row: number;
-    col: number;
+    readonly index: number;
+    readonly row: number;
+    readonly col: number;
 }
 
 export interface Range {
-    start: Position;
-    end?: Position;
+    readonly start: Position;
+    readonly end?: Position;
 }
 
 export interface Token {
-    tag: Tag;
-    text: string;
-    range: Range;
+    readonly tag: Tag;
+    readonly text: string;
+    readonly range: Range;
 }
