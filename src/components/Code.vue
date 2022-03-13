@@ -17,8 +17,9 @@ const code = Vue.computed(() => {
 </script>
 
 <style scoped lang="scss">
-pre {
+textarea {
     margin: 1rem;
     font-size: 1rem;
+    font-family: "JetBrains Mono", monospace;
 }
 </style>
