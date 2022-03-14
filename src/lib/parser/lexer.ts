@@ -41,7 +41,12 @@ export const lex = (input: string): LexResult => {
         }
 
         // no token patterns matched, push error & skip one character
-        errors.push({ range: { start: pos } });
+        errors.push({
+            range: {
+                start: { ...pos },
+                end: { index: pos.index + 1, col: pos.col + 1, row: pos.row },
+            },
+        });
         if (input[pos.index++] === "\n") {
             ++pos.row;
             pos.col = 0;

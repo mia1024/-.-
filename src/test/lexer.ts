@@ -1,4 +1,5 @@
 import * as Tap from "tap";
+// vi: shiftwidth=4
 import * as Lexer from "../lib/parser/lexer";
 import * as Token from "../lib/parser/token";
 
