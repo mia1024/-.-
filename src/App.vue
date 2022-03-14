@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import * as Vue from "vue";
-import Tree from "@components/Graph.vue";
+import Tree from "@components/Tree.vue";
 import Library from "@components/Library.vue";
 import Code from "@components/Code.vue";
 
