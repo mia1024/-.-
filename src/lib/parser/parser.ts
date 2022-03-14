@@ -51,8 +51,6 @@ const handleToken: Record<
         state.todo.push({
             node: undefined,
             container: { tag: ContainerTag.Paren, start: token.range.start },
-            //paren: token.range.start,
-            //lambda: null,
         });
     },
     [Token.Tag.Identifier](state, token) {
@@ -114,17 +112,14 @@ const handleToken: Record<
         }
 
         // real stuff
-        const curr: Todo<Tree | undefined> = {
+        state.todo.push({
             node: undefined,
             container: {
                 tag: ContainerTag.Lambda,
                 param: first.value.text,
                 start: tokenLambda.range.start,
             },
-            //paren: null,
-            //lambda: null,
-        };
-        state.todo.push(curr);
+        });
 
         for (;;) {
             const next = state.tokens.next();
