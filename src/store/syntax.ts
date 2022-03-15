@@ -4,7 +4,7 @@ import * as Tree from "@lib/tree";
 import * as Parser from "@lib/parser";
 
 export interface State {
-    nodes: Tree.TreeDict<Metadata>;
+    nodes: Tree.TreeDict<Tree.Metadata.Full>;
     trail: Tree.TreeKey[];
     focus: Tree.TreeKey | null;
 
@@ -20,27 +20,10 @@ export interface State {
     structureStamp: symbol;
 }
 
-export interface BoundingBox {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-}
-
-export interface Geometry {
-    tree: BoundingBox;
-    node: BoundingBox;
-    left?: BoundingBox;
-}
-
-export interface Metadata {
-    geometry?: Geometry;
-}
-
 export const store = Pinia.defineStore("syntax", {
     state: (): State => {
         const root = Symbol();
-        const nodes = Tree.newTreeDict<Metadata>();
+        const nodes = Tree.newTreeDict<Tree.Metadata.Full>();
         nodes.set(root, Tree.Node.blank({}));
         return {
             nodes,
@@ -93,7 +76,7 @@ export const store = Pinia.defineStore("syntax", {
             this.stamp = Symbol();
             this.structureStamp = Symbol();
         },
-        setGeometry(key: Tree.TreeKey, geometry: Geometry) {
+        setGeometry(key: Tree.TreeKey, geometry: Tree.Metadata.Geometry) {
             const node = this.nodes.get(key);
             if (typeof node === "undefined")
                 throw Error("updateGeometry on missing node");

@@ -14,7 +14,7 @@ export interface Error {
     readonly token?: Token.Token; // TODO location handling for end
 }
 
-type Tree = Tree.Tree<Token.Range>;
+type Tree = Tree.Tree<Tree.Metadata.Range>;
 
 const enum ContainerTag {
     Paren,
@@ -28,8 +28,12 @@ interface Todo<Node> {
     node: Node;
     container:
         | { tag: ContainerTag.Root }
-        | { tag: ContainerTag.Paren; start: Token.Position }
-        | { tag: ContainerTag.Lambda; param: string; start: Token.Position };
+        | { tag: ContainerTag.Paren; start: Tree.Metadata.Position }
+        | {
+              tag: ContainerTag.Lambda;
+              param: string;
+              start: Tree.Metadata.Position;
+          };
 }
 
 export type Result =
@@ -40,7 +44,7 @@ interface State {
     readonly todo: Todo<Tree | undefined>[];
     readonly errs: Error[];
     readonly tokens: IterableIterator<Token.Token>;
-    end: Token.Position;
+    end: Tree.Metadata.Position;
 }
 
 const handleToken: Record<
@@ -188,12 +192,12 @@ export function parse(tokens: readonly Token.Token[]): Result {
                 node: undefined,
                 container: {
                     tag: ContainerTag.Root,
-                } /*paren: null, lambda: null */,
+                },
             },
         ],
         errs: [],
         tokens: tokens[Symbol.iterator](),
-        end: Token.start,
+        end: Tree.Metadata.start,
     };
 
     for (;;) {
@@ -228,7 +232,7 @@ function insertTop(state: State, node: Tree) {
     insertNode(top, node);
 }
 
-function finalize(todo: Todo<Tree>, parenEnd: Token.Position): Tree {
+function finalize(todo: Todo<Tree>, parenEnd: Tree.Metadata.Position): Tree {
     switch (todo.container.tag) {
         case ContainerTag.Root:
             return todo.node;

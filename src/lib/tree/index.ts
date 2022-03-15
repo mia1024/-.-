@@ -1,6 +1,8 @@
 import * as Node from "./node";
 export * as Node from "./node";
 
+export * as Metadata from "./metadata";
+
 // structured representation
 export type Tree<Metadata> = Node.Node<Tree<Metadata>, Metadata>;
 

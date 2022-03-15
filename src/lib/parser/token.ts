@@ -1,4 +1,6 @@
 // vi: shiftwidth=4
+import * as Tree from "@lib/tree";
+
 export const enum Tag {
     ParenL,
     ParenR,
@@ -23,40 +25,18 @@ export const definitions: readonly Definition[] = [
     { tag: null, pattern: /\s+/ },
 ].map((def) => ({ ...def, pattern: RegExp(def.pattern, "myu") }));
 
-// TODO make syntax metadata
-export interface Position {
-    readonly index: number;
-    readonly row: number;
-    readonly col: number;
-}
-
-export interface Range {
-    readonly start: Position;
-    readonly end: Position;
-}
-
 export interface Token {
     readonly tag: Tag;
     readonly text: string;
-    readonly range: Range;
+    readonly range: Tree.Metadata.Range;
 }
-
-export const start: Position = Object.freeze({ index: 0, row: 0, col: 0 });
-
-/* Combine two disjoint ranges.  TODO make this more correct by actually
- * comparing endpoints
- */
-export const combine = (a: Range, b: Range): Range => ({
-    start: a.start,
-    end: b.end,
-});
 
 /* Shorthand constructors for quickly/conveniently creating token objects;
  * intended only for testing use
  */
 export const shorthand = {
-    pos: (i: number): Position => ({ index: i, row: 0, col: i }),
-    range: (i: number, j: number): Range => ({
+    pos: (i: number): Tree.Metadata.Position => ({ index: i, row: 0, col: i }),
+    range: (i: number, j: number): Tree.Metadata.Range => ({
         start: { index: i, row: 0, col: i },
         end: { index: j, row: 0, col: j },
     }),

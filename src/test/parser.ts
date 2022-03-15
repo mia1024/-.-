@@ -11,7 +11,7 @@ Tap.test("parse from tokens", (t) => {
 
     const cases: {
         tokens: Token.Token[];
-        expression: Tree.Tree<Token.Range>;
+        expression: Tree.Tree<Tree.Metadata.Range>;
     }[] = [
         {
             // `var`

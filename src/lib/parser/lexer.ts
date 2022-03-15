@@ -1,7 +1,8 @@
 import * as Token from "./token";
+import * as Tree from "@lib/tree";
 
 export interface Error {
-    range: Token.Range;
+    range: Tree.Metadata.Range;
 }
 
 export type LexResult =
@@ -28,7 +29,7 @@ export const lex = (input: string): LexResult => {
             pos.row += lines.length - 1;
             pos.col = lines[lines.length - 1]!.length;
 
-            const end: Token.Position = { ...pos };
+            const end: Tree.Metadata.Position = { ...pos };
 
             if (def.tag !== null)
                 tokens.push({

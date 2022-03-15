@@ -25,7 +25,7 @@ interface Edge {
     child: Position;
 }
 
-const getCenter = (box: Store.SyntaxStore.BoundingBox): Position => ({
+const getCenter = (box: Tree.Metadata.BoundingBox): Position => ({
     x: box.left + box.width / 2,
     y: box.top + box.height / 2,
 });
