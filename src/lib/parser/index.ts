@@ -1,6 +1,6 @@
 import * as Parser from "./parser";
 import * as Lexer from "./lexer";
-import * as Syntax from "@lib/syntax";
+import * as Tree from "@lib/tree";
 import * as Token from "./token";
 
 export const enum ResultTag {
@@ -12,7 +12,7 @@ export const enum ResultTag {
 export type Result =
     | {
           readonly tag: ResultTag.Ok;
-          readonly expression: Syntax.Tree<Token.Range> | null;
+          readonly expression: Tree.Tree<Token.Range> | null;
       }
     | {
           readonly tag: ResultTag.LexFail;

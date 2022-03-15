@@ -1,6 +1,6 @@
 // vi: sw=4
 import * as Token from "./token";
-import * as Syntax from "../syntax";
+import * as Tree from "../tree";
 
 export const enum ErrorTag {
     UnexpectedToken,
@@ -14,7 +14,7 @@ export interface Error {
     readonly token?: Token.Token; // TODO location handling for end
 }
 
-type Tree = Syntax.Tree<Token.Range>;
+type Tree = Tree.Tree<Token.Range>;
 
 const enum ContainerTag {
     Paren,
@@ -54,10 +54,10 @@ const handleToken: Record<
         });
     },
     [Token.Tag.Identifier](state, token) {
-        insertTop(state, Syntax.Node.variable(token.text, token.range));
+        insertTop(state, Tree.Node.variable(token.text, token.range));
     },
     [Token.Tag.Hole](state, token) {
-        insertTop(state, Syntax.Node.blank(token.range));
+        insertTop(state, Tree.Node.blank(token.range));
     },
     [Token.Tag.ParenR](state, token) {
         for (;;) {
@@ -216,7 +216,7 @@ function insertNode(elem: Todo<Tree | undefined>, node: Tree) {
     elem.node =
         typeof elem.node === "undefined"
             ? node
-            : Syntax.Node.application(elem.node, node, {
+            : Tree.Node.application(elem.node, node, {
                   start: elem.node.metadata.start,
                   end: node.metadata.end,
               });
@@ -233,7 +233,7 @@ function finalize(todo: Todo<Tree>, parenEnd: Token.Position): Tree {
         case ContainerTag.Root:
             return todo.node;
         case ContainerTag.Lambda:
-            return Syntax.Node.abstraction(todo.container.param, todo.node, {
+            return Tree.Node.abstraction(todo.container.param, todo.node, {
                 start: todo.container.start,
                 end: todo.node.metadata.end,
             });

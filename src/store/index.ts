@@ -1,12 +1,8 @@
 import * as Pinia from "pinia";
-import * as Syntax from "../lib/syntax";
 
 export * as SyntaxStore from "./syntax";
 
 export { store as syntax } from "./syntax";
-
-type BoundingBox = Record<"left" | "top" | "width" | "height", number>;
-type Geometry = Record<"tree" | "node", BoundingBox>;
 
 export interface State {}
 

@@ -5,7 +5,7 @@
 
 <script lang="ts" setup>
 import * as Store from "@/store";
-import * as Syntax from "@/lib/syntax";
+import * as Tree from "@lib/tree";
 import * as Vue from "vue";
 
 import * as CmState from "@codemirror/state";
@@ -51,8 +51,8 @@ Vue.watch([editor, () => store.structureStamp], () => {
     if (editor.value === null) return;
 
     const root = store.trail[store.trail.length - 1]!;
-    const tree = Syntax.structure(store.nodes, root);
-    const stuff = Syntax.stringifyCompact(tree);
+    const tree = Tree.structure(store.nodes, root);
+    const stuff = Tree.stringifyCompact(tree);
 
     editor.value.dispatch(
         editor.value.state.update({
@@ -67,8 +67,8 @@ Vue.watch([editor, () => store.structureStamp], () => {
 
 //const code = Vue.computed(() => {
 //    const root = store.trail[store.trail.length - 1]!;
-//    const tree = Syntax.structure(store.nodes, root);
-//    return Syntax.stringifyCompact(tree);
+//    const tree = Tree.structure(store.nodes, root);
+//    return Tree.stringifyCompact(tree);
 //});
 </script>
 

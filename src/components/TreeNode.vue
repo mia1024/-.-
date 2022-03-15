@@ -10,18 +10,18 @@
             <div
                 class="node"
                 :class="{
-                    blank: expr.data.type === Syntax.Node.NodeType.Blank,
+                    blank: expr.data.type === Tree.Node.NodeType.Blank,
                 }"
                 ref="node"
             >
                 <button
                     @click="store.prune(nodeKey)"
                     class="close"
-                    v-if="expr.data.type !== Syntax.Node.NodeType.Blank"
+                    v-if="expr.data.type !== Tree.Node.NodeType.Blank"
                 >
                     ×
                 </button>
-                <template v-if="expr.data.type === Syntax.Node.NodeType.Blank">
+                <template v-if="expr.data.type === Tree.Node.NodeType.Blank">
                     <div class="hole" />
                     <div class="new">
                         <div class="pad">
@@ -37,9 +37,7 @@
                         </div>
                     </div>
                 </template>
-                <template
-                    v-if="expr.data.type === Syntax.Node.NodeType.Variable"
-                >
+                <template v-if="expr.data.type === Tree.Node.NodeType.Variable">
                     <input
                         class="var"
                         :value="expr.data.name"
@@ -47,21 +45,19 @@
                     />
                 </template>
                 <template
-                    v-if="expr.data.type === Syntax.Node.NodeType.Abstraction"
+                    v-if="expr.data.type === Tree.Node.NodeType.Abstraction"
                 >
                     λ
                 </template>
                 <template
-                    v-if="expr.data.type === Syntax.Node.NodeType.Application"
+                    v-if="expr.data.type === Tree.Node.NodeType.Application"
                 >
                     $
                 </template>
             </div>
         </div>
         <div class="children">
-            <template
-                v-if="expr.data.type === Syntax.Node.NodeType.Abstraction"
-            >
+            <template v-if="expr.data.type === Tree.Node.NodeType.Abstraction">
                 <div class="param" ref="left">
                     λ
                     <input
@@ -75,9 +71,7 @@
                     @mouseleave="setHover"
                 />
             </template>
-            <template
-                v-if="expr.data.type === Syntax.Node.NodeType.Application"
-            >
+            <template v-if="expr.data.type === Tree.Node.NodeType.Application">
                 <TreeNode
                     :nodeKey="expr.data.function"
                     @mouseenter="removeHover"
@@ -94,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import * as Syntax from "../lib/syntax";
+import * as Tree from "@lib/tree";
 import * as Store from "../store";
 import * as Vue from "vue";
 

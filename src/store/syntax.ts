@@ -1,12 +1,12 @@
 // vi: shiftwidth=4
 import * as Pinia from "pinia";
-import * as Syntax from "@lib/syntax";
+import * as Tree from "@lib/tree";
 import * as Parser from "@lib/parser";
 
 export interface State {
-    nodes: Syntax.TreeDict<Metadata>;
-    trail: Syntax.TreeKey[];
-    focus: Syntax.TreeKey | null;
+    nodes: Tree.TreeDict<Metadata>;
+    trail: Tree.TreeKey[];
+    focus: Tree.TreeKey | null;
 
     // updated each time tree structure is modified; useful for triggering
     // DOM-layout detection reupdates via `watch`.  maybe we can use
@@ -40,8 +40,8 @@ export interface Metadata {
 export const store = Pinia.defineStore("syntax", {
     state: (): State => {
         const root = Symbol();
-        const nodes = Syntax.newTreeDict<Metadata>();
-        nodes.set(root, Syntax.Node.blank({}));
+        const nodes = Tree.newTreeDict<Metadata>();
+        nodes.set(root, Tree.Node.blank({}));
         return {
             nodes,
             trail: [root],
@@ -52,23 +52,23 @@ export const store = Pinia.defineStore("syntax", {
     },
     actions: {
         newBlank() {
-            const key = Syntax.newTreeKey();
-            this.nodes.set(key, Syntax.Node.blank({}));
+            const key = Tree.newTreeKey();
+            this.nodes.set(key, Tree.Node.blank({}));
             return key;
         },
-        makeVariable(key: Syntax.TreeKey) {
-            this.nodes.set(key, Syntax.Node.variable("x", {}));
+        makeVariable(key: Tree.TreeKey) {
+            this.nodes.set(key, Tree.Node.variable("x", {}));
             this.stamp = Symbol();
             this.structureStamp = Symbol();
         },
-        rename(key: Syntax.TreeKey, name: string) {
+        rename(key: Tree.TreeKey, name: string) {
             const node = this.nodes.get(key);
             if (typeof node === "undefined") throw Error("missing node");
             switch (node.data.type) {
-                case Syntax.Node.NodeType.Variable:
+                case Tree.Node.NodeType.Variable:
                     node.data.name = name;
                     break;
-                case Syntax.Node.NodeType.Abstraction:
+                case Tree.Node.NodeType.Abstraction:
                     node.data.parameter = name;
                     break;
                 default:
@@ -77,45 +77,45 @@ export const store = Pinia.defineStore("syntax", {
             this.stamp = Symbol();
             this.structureStamp = Symbol();
         },
-        makeAbstraction(key: Syntax.TreeKey) {
+        makeAbstraction(key: Tree.TreeKey) {
             this.nodes.set(
                 key,
-                Syntax.Node.abstraction("x", this.newBlank(), {}),
+                Tree.Node.abstraction("x", this.newBlank(), {}),
             );
             this.stamp = Symbol();
             this.structureStamp = Symbol();
         },
-        makeApplication(key: Syntax.TreeKey) {
+        makeApplication(key: Tree.TreeKey) {
             this.nodes.set(
                 key,
-                Syntax.Node.application(this.newBlank(), this.newBlank(), {}),
+                Tree.Node.application(this.newBlank(), this.newBlank(), {}),
             );
             this.stamp = Symbol();
             this.structureStamp = Symbol();
         },
-        setGeometry(key: Syntax.TreeKey, geometry: Geometry) {
+        setGeometry(key: Tree.TreeKey, geometry: Geometry) {
             const node = this.nodes.get(key);
             if (typeof node === "undefined")
                 throw Error("updateGeometry on missing node");
             node.metadata.geometry = geometry;
         },
-        prune(key: Syntax.TreeKey) {
-            const go = (k: Syntax.TreeKey) => {
+        prune(key: Tree.TreeKey) {
+            const go = (k: Tree.TreeKey) => {
                 const node = this.nodes.get(k);
                 if (typeof node === "undefined")
                     throw Error("prune root missing");
 
                 switch (node.data.type) {
-                    case Syntax.Node.NodeType.Abstraction:
+                    case Tree.Node.NodeType.Abstraction:
                         go(node.data.body);
                         break;
-                    case Syntax.Node.NodeType.Application:
+                    case Tree.Node.NodeType.Application:
                         go(node.data.function);
                         go(node.data.argument);
                         break;
                 }
 
-                node.data = { type: Syntax.Node.NodeType.Blank };
+                node.data = { type: Tree.Node.NodeType.Blank };
             };
 
             go(key);
@@ -129,8 +129,8 @@ export const store = Pinia.defineStore("syntax", {
             if (result.expression === null) return;
 
             // TODO tree diff & apply, for now we just replace
-            const dict = Syntax.flatten(
-                Syntax.mapMetadata(result.expression, () => ({})),
+            const dict = Tree.flatten(
+                Tree.mapMetadata(result.expression, () => ({})),
             );
             this.nodes = dict.nodes;
             this.trail = [dict.root];

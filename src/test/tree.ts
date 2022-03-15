@@ -5,34 +5,32 @@ import * as Tap from "tap";
 
 // import * as Syntax from "@lib/syntax";
 
-import * as Syntax from "../lib/syntax";
+import * as Tree from "../lib/tree";
 
 Tap.test("basic `flatten` tests", (t) => {
     t.test("blank", (t) => {
-        const { nodes, root } = Syntax.flatten(
-            Syntax.Node.blank("dummy metadata"),
-        );
+        const { nodes, root } = Tree.flatten(Tree.Node.blank("dummy metadata"));
         t.equal(nodes.size, 1);
-        t.same(nodes.get(root), Syntax.Node.blank("dummy metadata"));
+        t.same(nodes.get(root), Tree.Node.blank("dummy metadata"));
 
         t.end();
     });
 
     t.test("variable", (t) => {
-        const { nodes, root } = Syntax.flatten(
-            Syntax.Node.variable("varName", "metabanana"),
+        const { nodes, root } = Tree.flatten(
+            Tree.Node.variable("varName", "metabanana"),
         );
         t.equal(nodes.size, 1);
-        t.same(nodes.get(root), Syntax.Node.variable("varName", "metabanana"));
+        t.same(nodes.get(root), Tree.Node.variable("varName", "metabanana"));
 
         t.end();
     });
 
     t.test("abstraction", (t) => {
-        const { nodes, root } = Syntax.flatten(
-            Syntax.Node.abstraction(
+        const { nodes, root } = Tree.flatten(
+            Tree.Node.abstraction(
                 "paramName",
-                Syntax.Node.variable("bodyName", "bodyMeta"),
+                Tree.Node.variable("bodyName", "bodyMeta"),
                 "absMeta",
             ),
         );
@@ -40,22 +38,22 @@ Tap.test("basic `flatten` tests", (t) => {
         const node = nodes.get(root);
         t.equal(nodes.size, 2);
         t.equal(node?.metadata, "absMeta");
-        t.equal(node?.data.type, Syntax.Node.NodeType.Abstraction);
+        t.equal(node?.data.type, Tree.Node.NodeType.Abstraction);
 
-        if (node?.data.type !== Syntax.Node.NodeType.Abstraction) return; // type guard
+        if (node?.data.type !== Tree.Node.NodeType.Abstraction) return; // type guard
         t.equal(node.data.parameter, "paramName");
 
         const body = nodes.get(node.data.body);
-        t.same(body, Syntax.Node.variable("bodyName", "bodyMeta"));
+        t.same(body, Tree.Node.variable("bodyName", "bodyMeta"));
 
         t.end();
     });
 
     t.test("application", (t) => {
-        const { nodes, root } = Syntax.flatten(
-            Syntax.Node.application(
-                Syntax.Node.variable("fnName", "fnMeta"),
-                Syntax.Node.variable("argName", "argMeta"),
+        const { nodes, root } = Tree.flatten(
+            Tree.Node.application(
+                Tree.Node.variable("fnName", "fnMeta"),
+                Tree.Node.variable("argName", "argMeta"),
                 "appMeta",
             ),
         );
@@ -63,17 +61,17 @@ Tap.test("basic `flatten` tests", (t) => {
         const node = nodes.get(root);
         t.equal(nodes.size, 3);
         t.equal(node?.metadata, "appMeta");
-        t.equal(node?.data.type, Syntax.Node.NodeType.Application);
+        t.equal(node?.data.type, Tree.Node.NodeType.Application);
 
-        if (node?.data.type !== Syntax.Node.NodeType.Application) return; // type guard
+        if (node?.data.type !== Tree.Node.NodeType.Application) return; // type guard
 
         t.same(
             nodes.get(node.data.function),
-            Syntax.Node.variable("fnName", "fnMeta"),
+            Tree.Node.variable("fnName", "fnMeta"),
         );
         t.same(
             nodes.get(node.data.argument),
-            Syntax.Node.variable("argName", "argMeta"),
+            Tree.Node.variable("argName", "argMeta"),
         );
 
         t.end();

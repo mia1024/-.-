@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import * as Store from "@/store";
-import * as Syntax from "@/lib/syntax";
+import * as Tree from "@/lib/tree";
 import * as Vue from "vue";
 
 const store = Store.syntax();
@@ -36,13 +36,13 @@ const edges = Vue.computed(() => {
         throw Error("very bad very very bad trail should always be nonempty");
 
     const edges: Edge[] = [];
-    const go = (key: Syntax.TreeKey) => {
+    const go = (key: Tree.TreeKey) => {
         const node = store.nodes.get(key);
         if (typeof node === "undefined") throw Error("edges: missing node");
         const geom = node.metadata.geometry;
 
         switch (node.data.type) {
-            case Syntax.Node.NodeType.Abstraction:
+            case Tree.Node.NodeType.Abstraction:
                 const paramBox = node.metadata.geometry?.left;
                 const bodyGeom = store.nodes.get(node.data.body)?.metadata
                     .geometry;
@@ -60,7 +60,7 @@ const edges = Vue.computed(() => {
                 }
                 go(node.data.body);
                 break;
-            case Syntax.Node.NodeType.Application:
+            case Tree.Node.NodeType.Application:
                 const fnGeom = store.nodes.get(node.data.function)?.metadata
                     .geometry;
                 const argGeom = store.nodes.get(node.data.argument)?.metadata
