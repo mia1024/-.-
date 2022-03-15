@@ -1,17 +1,17 @@
 import * as Token from "./token";
 
-export interface LexError {
+export interface Error {
     range: Token.Range;
 }
 
 export type LexResult =
     | { ok: true; tokens: readonly Token.Token[] }
-    | { ok: false; errors: readonly LexError[] };
+    | { ok: false; errors: readonly Error[] };
 
 export const lex = (input: string): LexResult => {
     const pos = { index: 0, row: 0, col: 0 };
     const tokens: Token.Token[] = [];
-    const errors: LexError[] = [];
+    const errors: Error[] = [];
 
     outer: while (pos.index < input.length) {
         for (const def of Token.definitions) {

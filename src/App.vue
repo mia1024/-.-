@@ -26,16 +26,18 @@ import * as Store from "./store";
 const store = Store.syntax();
 
 function handleKey(ev: KeyboardEvent) {
-    if (
-        store.focus !== null &&
-        (ev.code === "Delete" || ev.code === "Backspace")
-    )
-        store.prune(store.focus);
+    // disabling for now because it's annoying af when it accidentally triggers
+    //if (
+    //    store.focus !== null &&
+    //    (ev.code === "Delete" || ev.code === "Backspace")
+    //)
+    //    store.prune(store.focus);
 }
 
 function warnBeforeLeave(e: BeforeUnloadEvent) {
-    e.preventDefault();
-    e.returnValue = "";
+    // disabling for now because it's annoying af while debugging
+    //e.preventDefault();
+    //e.returnValue = "";
 }
 
 Vue.onMounted(() => {
@@ -77,6 +79,7 @@ Vue.onUnmounted(() => {
         .code-view {
             flex-basis: 0;
             flex-grow: 1;
+            position: relative;
         }
     }
 }

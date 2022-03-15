@@ -73,7 +73,11 @@ const handleToken: Record<
             const tree = finalize({ ...top, node: top.node }, token.range.end);
 
             const parent = state.todo[state.todo.length - 1];
-            if (typeof parent === "undefined") throw Error("empty");
+            if (typeof parent === "undefined") {
+                state.errs.push({ tag: ErrorTag.ExtraClose, token });
+                state.todo.push(top); // for error recovery
+                return;
+            }
             insertNode(parent, tree);
 
             //if (top.paren !== null) return;
@@ -175,7 +179,7 @@ parent node.
 [1]: http://www.cs.ecu.edu/karl/5220/spr16/Notes/Top-down/LL1.html
 
 */
-export function parse(tokens: Token.Token[]): Result {
+export function parse(tokens: readonly Token.Token[]): Result {
     if (tokens.length === 0) return { ok: true, expression: null };
 
     const state: State = {

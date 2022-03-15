@@ -1,5 +1,7 @@
+// vi: shiftwidth=4
 import * as Pinia from "pinia";
 import * as Syntax from "@lib/syntax";
+import * as Parser from "@lib/parser";
 
 export interface State {
     nodes: Syntax.TreeDict<Metadata>;
@@ -10,6 +12,12 @@ export interface State {
     // DOM-layout detection reupdates via `watch`.  maybe we can use
     // `ResizeObserver` too, but we'll figure that out later.
     stamp: symbol;
+
+    // updated each time structure is modified from interactive/structural
+    // editor _only_ (not code editor); used via `watch` to trigger code
+    // update.  TODO this is a temporary hack--eventually i think we want to do
+    // smarter, diff'ed changes based on ranges
+    structureStamp: symbol;
 }
 
 export interface BoundingBox {
@@ -39,6 +47,7 @@ export const store = Pinia.defineStore("syntax", {
             trail: [root],
             focus: null,
             stamp: Symbol(),
+            structureStamp: Symbol(),
         };
     },
     actions: {
@@ -50,6 +59,23 @@ export const store = Pinia.defineStore("syntax", {
         makeVariable(key: Syntax.TreeKey) {
             this.nodes.set(key, Syntax.Node.variable("x", {}));
             this.stamp = Symbol();
+            this.structureStamp = Symbol();
+        },
+        rename(key: Syntax.TreeKey, name: string) {
+            const node = this.nodes.get(key);
+            if (typeof node === "undefined") throw Error("missing node");
+            switch (node.data.type) {
+                case Syntax.Node.NodeType.Variable:
+                    node.data.name = name;
+                    break;
+                case Syntax.Node.NodeType.Abstraction:
+                    node.data.parameter = name;
+                    break;
+                default:
+                    throw Error("not a renameable node");
+            }
+            this.stamp = Symbol();
+            this.structureStamp = Symbol();
         },
         makeAbstraction(key: Syntax.TreeKey) {
             this.nodes.set(
@@ -57,6 +83,7 @@ export const store = Pinia.defineStore("syntax", {
                 Syntax.Node.abstraction("x", this.newBlank(), {}),
             );
             this.stamp = Symbol();
+            this.structureStamp = Symbol();
         },
         makeApplication(key: Syntax.TreeKey) {
             this.nodes.set(
@@ -64,6 +91,7 @@ export const store = Pinia.defineStore("syntax", {
                 Syntax.Node.application(this.newBlank(), this.newBlank(), {}),
             );
             this.stamp = Symbol();
+            this.structureStamp = Symbol();
         },
         setGeometry(key: Syntax.TreeKey, geometry: Geometry) {
             const node = this.nodes.get(key);
@@ -91,6 +119,21 @@ export const store = Pinia.defineStore("syntax", {
             };
 
             go(key);
+            this.stamp = Symbol();
+            this.structureStamp = Symbol();
+        },
+        codeChange(code: string) {
+            const result = Parser.parse(code);
+            if (result.tag !== Parser.ResultTag.Ok) return; // TODO
+
+            if (result.expression === null) return;
+
+            // TODO tree diff & apply, for now we just replace
+            const dict = Syntax.flatten(
+                Syntax.mapMetadata(result.expression, () => ({})),
+            );
+            this.nodes = dict.nodes;
+            this.trail = [dict.root];
             this.stamp = Symbol();
         },
     },

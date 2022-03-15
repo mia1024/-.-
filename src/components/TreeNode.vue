@@ -40,7 +40,11 @@
                 <template
                     v-if="expr.data.type === Syntax.Node.NodeType.Variable"
                 >
-                    <input class="var" v-model="expr.data.name" />
+                    <input
+                        class="var"
+                        :value="expr.data.name"
+                        @input="(e) => store.rename(nodeKey, (e.target as HTMLInputElement).value)"
+                    />
                 </template>
                 <template
                     v-if="expr.data.type === Syntax.Node.NodeType.Abstraction"
@@ -59,7 +63,11 @@
                 v-if="expr.data.type === Syntax.Node.NodeType.Abstraction"
             >
                 <div class="param" ref="left">
-                    λ <input v-model="expr.data.parameter" />
+                    λ
+                    <input
+                        :value="expr.data.parameter"
+                        @input="e => store.rename(nodeKey, (e.target as HTMLInputElement).value)"
+                    />
                 </div>
                 <TreeNode
                     :nodeKey="expr.data.body"

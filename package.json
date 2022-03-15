@@ -15,6 +15,11 @@
     "private": false,
     "type": "module",
     "devDependencies": {
+        "@codemirror/commands": "^0.19.8",
+        "@codemirror/gutter": "^0.19.9",
+        "@codemirror/state": "^0.19.9",
+        "@codemirror/text": "^0.19.6",
+        "@codemirror/view": "^0.19.47",
         "@types/node": "^17.0.17",
         "@types/tap": "^15.0.6",
         "@vitejs/plugin-vue": "^2.2.0",
