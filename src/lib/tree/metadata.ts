@@ -27,7 +27,7 @@ export interface Full {
     range?: Range;
 }
 
-export const start: Position = Object.freeze({
+export const startPosition: Position = Object.freeze({
     index: 0,
     row: 0,
     col: 0,

@@ -197,7 +197,7 @@ export function parse(tokens: readonly Token.Token[]): Result {
         ],
         errs: [],
         tokens: tokens[Symbol.iterator](),
-        end: Tree.Metadata.start,
+        end: Tree.Metadata.startPosition,
     };
 
     for (;;) {
