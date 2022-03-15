@@ -41,8 +41,8 @@ const edges = Vue.computed(() => {
         if (typeof node === "undefined") throw Error("edges: missing node");
         const geom = node.metadata.geometry;
 
-        switch (node.data.type) {
-            case Tree.Node.NodeType.Abstraction:
+        switch (node.data.tag) {
+            case Tree.Node.Tag.Abstraction:
                 const paramBox = node.metadata.geometry?.left;
                 const bodyGeom = store.nodes.get(node.data.body)?.metadata
                     .geometry;
@@ -60,7 +60,7 @@ const edges = Vue.computed(() => {
                 }
                 go(node.data.body);
                 break;
-            case Tree.Node.NodeType.Application:
+            case Tree.Node.Tag.Application:
                 const fnGeom = store.nodes.get(node.data.function)?.metadata
                     .geometry;
                 const argGeom = store.nodes.get(node.data.argument)?.metadata

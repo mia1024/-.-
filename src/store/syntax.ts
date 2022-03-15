@@ -64,11 +64,11 @@ export const store = Pinia.defineStore("syntax", {
         rename(key: Tree.TreeKey, name: string) {
             const node = this.nodes.get(key);
             if (typeof node === "undefined") throw Error("missing node");
-            switch (node.data.type) {
-                case Tree.Node.NodeType.Variable:
+            switch (node.data.tag) {
+                case Tree.Node.Tag.Variable:
                     node.data.name = name;
                     break;
-                case Tree.Node.NodeType.Abstraction:
+                case Tree.Node.Tag.Abstraction:
                     node.data.parameter = name;
                     break;
                 default:
@@ -105,17 +105,17 @@ export const store = Pinia.defineStore("syntax", {
                 if (typeof node === "undefined")
                     throw Error("prune root missing");
 
-                switch (node.data.type) {
-                    case Tree.Node.NodeType.Abstraction:
+                switch (node.data.tag) {
+                    case Tree.Node.Tag.Abstraction:
                         go(node.data.body);
                         break;
-                    case Tree.Node.NodeType.Application:
+                    case Tree.Node.Tag.Application:
                         go(node.data.function);
                         go(node.data.argument);
                         break;
                 }
 
-                node.data = { type: Tree.Node.NodeType.Blank };
+                node.data = { tag: Tree.Node.Tag.Blank };
             };
 
             go(key);

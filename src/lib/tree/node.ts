@@ -1,4 +1,4 @@
-export const enum NodeType {
+export const enum Tag {
     Variable,
     Abstraction,
     Application,
@@ -15,15 +15,15 @@ export const enum NodeType {
 // window coordinates for drawing edges, row/col numbers in code editor, etc.
 export interface Node<Subtree, Metadata> {
     data:
-        | { type: NodeType.Blank }
-        | { type: NodeType.Variable; name: string }
+        | { tag: Tag.Blank }
+        | { tag: Tag.Variable; name: string }
         | {
-              type: NodeType.Abstraction;
+              tag: Tag.Abstraction;
               parameter: string;
               body: Subtree;
           }
         | {
-              type: NodeType.Application;
+              tag: Tag.Application;
               function: Subtree;
               argument: Subtree;
           };
@@ -34,7 +34,7 @@ export function blank<Subtree, Metadata>(
     metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: { type: NodeType.Blank },
+        data: { tag: Tag.Blank },
         metadata,
     };
 }
@@ -44,7 +44,7 @@ export function variable<Subtree, Metadata>(
     metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: { type: NodeType.Variable, name },
+        data: { tag: Tag.Variable, name },
         metadata,
     };
 }
@@ -55,7 +55,7 @@ export function abstraction<Subtree, Metadata>(
     metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: { type: NodeType.Abstraction, parameter, body },
+        data: { tag: Tag.Abstraction, parameter, body },
         metadata,
     };
 }
@@ -66,7 +66,7 @@ export function application<Subtree, Metadata>(
     metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: { type: NodeType.Application, function: fn, argument },
+        data: { tag: Tag.Application, function: fn, argument },
         metadata,
     };
 }

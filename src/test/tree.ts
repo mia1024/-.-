@@ -38,9 +38,9 @@ Tap.test("basic `flatten` tests", (t) => {
         const node = nodes.get(root);
         t.equal(nodes.size, 2);
         t.equal(node?.metadata, "absMeta");
-        t.equal(node?.data.type, Tree.Node.NodeType.Abstraction);
+        t.equal(node?.data.tag, Tree.Node.Tag.Abstraction);
 
-        if (node?.data.type !== Tree.Node.NodeType.Abstraction) return; // type guard
+        if (node?.data.tag !== Tree.Node.Tag.Abstraction) return; // type guard
         t.equal(node.data.parameter, "paramName");
 
         const body = nodes.get(node.data.body);
@@ -61,9 +61,9 @@ Tap.test("basic `flatten` tests", (t) => {
         const node = nodes.get(root);
         t.equal(nodes.size, 3);
         t.equal(node?.metadata, "appMeta");
-        t.equal(node?.data.type, Tree.Node.NodeType.Application);
+        t.equal(node?.data.tag, Tree.Node.Tag.Application);
 
-        if (node?.data.type !== Tree.Node.NodeType.Application) return; // type guard
+        if (node?.data.tag !== Tree.Node.Tag.Application) return; // type guard
 
         t.same(
             nodes.get(node.data.function),

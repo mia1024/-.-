@@ -10,18 +10,18 @@
             <div
                 class="node"
                 :class="{
-                    blank: expr.data.type === Tree.Node.NodeType.Blank,
+                    blank: expr.data.tag === Tree.Node.Tag.Blank,
                 }"
                 ref="node"
             >
                 <button
                     @click="store.prune(nodeKey)"
                     class="close"
-                    v-if="expr.data.type !== Tree.Node.NodeType.Blank"
+                    v-if="expr.data.tag !== Tree.Node.Tag.Blank"
                 >
                     ×
                 </button>
-                <template v-if="expr.data.type === Tree.Node.NodeType.Blank">
+                <template v-if="expr.data.tag === Tree.Node.Tag.Blank">
                     <div class="hole" />
                     <div class="new">
                         <div class="pad">
@@ -37,27 +37,23 @@
                         </div>
                     </div>
                 </template>
-                <template v-if="expr.data.type === Tree.Node.NodeType.Variable">
+                <template v-if="expr.data.tag === Tree.Node.Tag.Variable">
                     <input
                         class="var"
                         :value="expr.data.name"
                         @input="(e) => store.rename(nodeKey, (e.target as HTMLInputElement).value)"
                     />
                 </template>
-                <template
-                    v-if="expr.data.type === Tree.Node.NodeType.Abstraction"
-                >
+                <template v-if="expr.data.tag === Tree.Node.Tag.Abstraction">
                     λ
                 </template>
-                <template
-                    v-if="expr.data.type === Tree.Node.NodeType.Application"
-                >
+                <template v-if="expr.data.tag === Tree.Node.Tag.Application">
                     $
                 </template>
             </div>
         </div>
         <div class="children">
-            <template v-if="expr.data.type === Tree.Node.NodeType.Abstraction">
+            <template v-if="expr.data.tag === Tree.Node.Tag.Abstraction">
                 <div class="param" ref="left">
                     λ
                     <input
@@ -71,7 +67,7 @@
                     @mouseleave="setHover"
                 />
             </template>
-            <template v-if="expr.data.type === Tree.Node.NodeType.Application">
+            <template v-if="expr.data.tag === Tree.Node.Tag.Application">
                 <TreeNode
                     :nodeKey="expr.data.function"
                     @mouseenter="removeHover"
