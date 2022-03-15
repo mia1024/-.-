@@ -25,7 +25,7 @@ Vue.onMounted(() => {
             extensions: [
                 CmView.EditorView.theme({
                     "&": { fontSize: 12 },
-                    ".cm-content": { fontFamily: "JetBrains Mono" },
+                    ".cm-content": { fontFamily: "JetBrainsMono" },
                     "&.cm-editor.cm-focused": { outline: "none" },
                 }),
                 CmGutter.lineNumbers(),
