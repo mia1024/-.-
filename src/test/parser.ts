@@ -10,21 +10,22 @@ Tap.test("parse from tokens", (t) => {
     const { pl, pr, hole, dot, λ, id, pos, range, assemble } = Token.shorthand;
 
     const cases: {
+        label: string;
         tokens: Token.Token[];
         expression: Tree.Tree<Tree.Metadata.Range>;
     }[] = [
         {
-            // `var`
+            label: "var",
             tokens: assemble([id("var")]),
             expression: Tree.Node.variable("var", range(0, 3)),
         },
         {
-            // `( parenVar )`
+            label: "( parenVar )",
             tokens: assemble([pl, id("parenVar"), pr]),
             expression: Tree.Node.variable("parenVar", range(0, 12)),
         },
         {
-            // `fn arg`
+            label: "fn arg",
             tokens: assemble([id("fn"), id("arg")]),
             expression: Tree.Node.application(
                 Tree.Node.variable("fn", range(0, 2)),
@@ -33,16 +34,47 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `_ _`
-            tokens: assemble([hole, hole]),
+            label: "( ) ( )",
+            tokens: assemble([pl, pr, pl, pr]),
             expression: Tree.Node.application(
-                Tree.Node.blank(range(0, 1)),
-                Tree.Node.blank(range(2, 3)),
-                range(0, 3),
+                Tree.Node.blank(range(0, 3)),
+                Tree.Node.blank(range(4, 7)),
+                range(0, 7),
             ),
         },
         {
-            // `a ( b c )`
+            label: "λ x .",
+            tokens: assemble([λ, id("x"), dot]),
+            expression: Tree.Node.abstraction(
+                "x",
+                Tree.Node.blank(range(5, 5)),
+                range(0, 5),
+            ),
+        },
+        {
+            label: "( λ x . ) y",
+            tokens: assemble([pl, λ, id("x"), dot, pr, id("y")]),
+            expression: Tree.Node.application(
+                Tree.Node.abstraction(
+                    "x",
+                    Tree.Node.blank(range(8, 8)),
+                    range(0, 9),
+                ),
+                Tree.Node.variable("y", range(10, 11)),
+                range(0, 11),
+            ),
+        },
+        {
+            label: "( ) x",
+            tokens: assemble([pl, pr, id("x")]),
+            expression: Tree.Node.application(
+                Tree.Node.blank(range(0, 3)),
+                Tree.Node.variable("x", range(4, 5)),
+                range(0, 5),
+            ),
+        },
+        {
+            label: "a ( b c )",
             tokens: assemble([id("a"), pl, id("b"), id("c"), pr]),
             expression: Tree.Node.application(
                 Tree.Node.variable("a", range(0, 1)),
@@ -55,7 +87,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `( a b ) c`
+            label: "( a b ) c",
             tokens: assemble([pl, id("a"), id("b"), pr, id("c")]),
             expression: Tree.Node.application(
                 Tree.Node.application(
@@ -68,7 +100,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `a b c`
+            label: "a b c",
             tokens: assemble([id("a"), id("b"), id("c")]),
             expression: Tree.Node.application(
                 Tree.Node.application(
@@ -81,7 +113,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `λ x . y`
+            label: "λ x . y",
             tokens: assemble([λ, id("x"), dot, id("y")]),
             expression: Tree.Node.abstraction(
                 "x",
@@ -90,7 +122,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `λ x . λ y . y x`
+            label: "λ x . λ y . y x",
             tokens: assemble([
                 λ,
                 id("x"),
@@ -116,7 +148,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `( ( x ( ( y ) ) ) )`
+            label: "( ( x ( ( y ) ) ) )",
             tokens: assemble([
                 pl,
                 pl,
@@ -136,7 +168,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `( λ x . x ) ( λ y . y ) f`
+            label: "( λ x . x ) ( λ y . y ) f",
             tokens: assemble([
                 pl,
                 λ,
@@ -171,7 +203,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `( ( λ x . ( ( x ) ) ) )`
+            label: "( ( λ x . ( ( x ) ) ) )",
             tokens: assemble([
                 pl,
                 pl,
@@ -193,7 +225,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `λ x y . y x`
+            label: "λ x y . y x",
             tokens: assemble([λ, id("x"), id("y"), dot, id("y"), id("x")]),
             expression: Tree.Node.abstraction(
                 "x",
@@ -210,7 +242,7 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            // `a ( λ v w x . λ y z . b ) c`
+            label: "a ( λ v w x . λ y z . b ) c",
             tokens: assemble([
                 id("a"),
                 pl,
@@ -261,8 +293,8 @@ Tap.test("parse from tokens", (t) => {
 
     for (const c of cases) {
         const result = Parser.parse(c.tokens);
-        t.ok(result.ok);
-        if (result.ok) t.same(result.expression, c.expression);
+        t.ok(result.ok, c.label);
+        if (result.ok) t.same(result.expression, c.expression, c.label);
         else console.log(result.errors);
     }
 

@@ -112,7 +112,7 @@ export const flatten = <Metadata>(
 export const stringifyCompact = <Metadata>(expr: Tree<Metadata>): string => {
     switch (expr.data.tag) {
         case Node.Tag.Blank:
-            return "◯";
+            return "()";
         case Node.Tag.Variable:
             return expr.data.name;
         case Node.Tag.Abstraction:

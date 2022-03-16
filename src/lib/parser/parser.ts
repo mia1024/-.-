@@ -68,13 +68,7 @@ const handleToken: Record<
             const top = state.todo.pop();
             if (typeof top === "undefined") throw Error("empty stack");
 
-            if (typeof top.node === "undefined") {
-                state.errs.push({ tag: ErrorTag.EmptyExpression, token });
-                return;
-            }
-
-            // reconstruct to narrow type
-            const tree = finalize({ ...top, node: top.node }, token.range.end);
+            const tree = finalize(top, token.range.start, token.range.end);
 
             const parent = state.todo[state.todo.length - 1];
             if (typeof parent === "undefined") {
@@ -84,7 +78,6 @@ const handleToken: Record<
             }
             insertNode(parent, tree);
 
-            //if (top.paren !== null) return;
             if (top.container.tag === ContainerTag.Paren) return;
         }
     },
@@ -232,19 +225,25 @@ function insertTop(state: State, node: Tree) {
     insertNode(top, node);
 }
 
-function finalize(todo: Todo<Tree>, parenEnd: Tree.Metadata.Position): Tree {
+function finalize(
+    todo: Todo<Tree | undefined>,
+    endBefore: Tree.Metadata.Position,
+    endAfter: Tree.Metadata.Position,
+): Tree {
+    const node =
+        todo.node ?? Tree.Node.blank({ start: endBefore, end: endBefore });
     switch (todo.container.tag) {
         case ContainerTag.Root:
-            return todo.node;
+            return node;
         case ContainerTag.Lambda:
-            return Tree.Node.abstraction(todo.container.param, todo.node, {
+            return Tree.Node.abstraction(todo.container.param, node, {
                 start: todo.container.start,
-                end: todo.node.metadata.end,
+                end: node.metadata.end,
             });
         case ContainerTag.Paren:
             return {
-                ...todo.node,
-                metadata: { start: todo.container.start, end: parenEnd },
+                ...node,
+                metadata: { start: todo.container.start, end: endAfter },
             };
     }
 }
@@ -259,13 +258,7 @@ function handleEnd(state: State): Tree | null {
             return null;
         }
 
-        if (typeof curr.node === "undefined") {
-            state.errs.push({ tag: ErrorTag.EmptyExpression });
-            return null;
-        }
-
-        // reconstruct to narrow type (could also cast, but prefer not to on principle)
-        const tree = finalize({ ...curr, node: curr.node }, state.end);
+        const tree = finalize(curr, state.end, state.end);
 
         const parent = state.todo.pop();
         if (typeof parent === "undefined") return tree;

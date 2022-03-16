@@ -25,13 +25,13 @@ Tap.test("lexer", (t) => {
                 ],
             },
             {
-                input: "λa○bc _",
+                input: "λa()bc",
                 tokens: [
                     { tag: Token.Tag.Lambda, text: "λ" },
                     { tag: Token.Tag.Identifier, text: "a" },
-                    { tag: Token.Tag.Hole, text: "○" },
+                    { tag: Token.Tag.ParenL, text: "(" },
+                    { tag: Token.Tag.ParenR, text: ")" },
                     { tag: Token.Tag.Identifier, text: "bc" },
-                    { tag: Token.Tag.Hole, text: "_" },
                 ],
             },
             {
@@ -57,16 +57,17 @@ Tap.test("lexer", (t) => {
 
         for (const c of cases) {
             const result = Lexer.lex(c.input);
-            t.ok(result.ok);
-            if (!result.ok) return; // type guard
-
-            t.strictSame(
-                result.tokens.map((token) => ({
-                    tag: token.tag,
-                    text: token.text,
-                })),
-                c.tokens,
-            );
+            t.ok(result.ok, c.input);
+            if (result.ok) {
+                t.strictSame(
+                    result.tokens.map((token) => ({
+                        tag: token.tag,
+                        text: token.text,
+                    })),
+                    c.tokens,
+                    c.input,
+                );
+            }
         }
 
         t.end();
