@@ -104,12 +104,27 @@ const handleToken: Record<
             state.errs.push({ tag: ErrorTag.UnexpectedEnd });
             return;
         }
-        if (first.value.tag !== Token.Tag.Identifier) {
-            state.errs.push({
-                tag: ErrorTag.UnexpectedToken,
-                token: first.value,
-            });
-            return;
+        state.end = first.value.range.end;
+
+        switch (first.value.tag) {
+            case Token.Tag.Dot:
+                state.todo.push({
+                    node: undefined,
+                    container: {
+                        tag: ContainerTag.Lambda,
+                        param: "",
+                        start: tokenLambda.range.start,
+                    },
+                });
+                return;
+            case Token.Tag.Identifier:
+                break;
+            default:
+                state.errs.push({
+                    tag: ErrorTag.UnexpectedToken,
+                    token: first.value,
+                });
+                return;
         }
 
         // real stuff
