@@ -60,8 +60,8 @@ const handleToken: Record<
     [Token.Tag.Identifier](state, token) {
         insertTop(state, Tree.Node.variable(token.text, token.range));
     },
-    [Token.Tag.Hole](state, token) {
-        insertTop(state, Tree.Node.blank(token.range));
+    [Token.Tag.Question](state, token) {
+        insertTop(state, Tree.Node.variable("", token.range));
     },
     [Token.Tag.ParenR](state, token) {
         for (;;) {

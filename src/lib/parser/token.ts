@@ -4,8 +4,8 @@ import * as Tree from "@lib/tree";
 export const enum Tag {
     ParenL,
     ParenR,
-    Hole,
     Lambda,
+    Question, // for representing empty variable names
     Dot,
     Identifier,
 }
@@ -18,9 +18,9 @@ export interface Definition {
 export const definitions: readonly Definition[] = [
     { tag: Tag.ParenL, pattern: /\(/ },
     { tag: Tag.ParenR, pattern: /\)/ },
-    { tag: Tag.Hole, pattern: /_|◯/ },
     { tag: Tag.Dot, pattern: /\./ },
     { tag: Tag.Lambda, pattern: /\\|λ/ },
+    { tag: Tag.Question, pattern: /\?/ },
     { tag: Tag.Identifier, pattern: /[A-Za-z_]\w*/ },
     { tag: null, pattern: /\s+/ },
 ].map((def) => ({ ...def, pattern: RegExp(def.pattern, "myu") }));
@@ -42,8 +42,8 @@ export const shorthand = {
     }),
     pl: { tag: Tag.ParenL, text: "(" },
     pr: { tag: Tag.ParenR, text: ")" },
-    hole: { tag: Tag.Hole, text: "_" },
     dot: { tag: Tag.Dot, text: "." },
+    q: { tag: Tag.Question, text: "?" },
     lambda: { tag: Tag.Lambda, text: "λ" },
     λ: { tag: Tag.Lambda, text: "λ" },
     id(s: string) {
