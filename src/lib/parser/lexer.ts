@@ -5,9 +5,10 @@ export interface Error {
     range: Tree.Metadata.Range;
 }
 
-export type LexResult =
-    | { ok: true; tokens: readonly Token.Token[] }
-    | { ok: false; errors: readonly Error[] };
+export interface LexResult {
+    readonly tokens: readonly Token.Token[];
+    readonly errors: readonly Error[];
+}
 
 export const lex = (input: string): LexResult => {
     const pos = { index: 0, row: 0, col: 0 };
@@ -54,5 +55,5 @@ export const lex = (input: string): LexResult => {
         } else ++pos.col;
     }
 
-    return errors.length === 0 ? { ok: true, tokens } : { ok: false, errors };
+    return { tokens, errors };
 };

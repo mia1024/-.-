@@ -58,17 +58,15 @@ Tap.test("lexer", (t) => {
 
         for (const c of cases) {
             const result = Lexer.lex(c.input);
-            t.ok(result.ok, c.input);
-            if (result.ok) {
-                t.strictSame(
-                    result.tokens.map((token) => ({
-                        tag: token.tag,
-                        text: token.text,
-                    })),
-                    c.tokens,
-                    c.input,
-                );
-            }
+            t.strictSame(result.errors, [], c.input);
+            t.strictSame(
+                result.tokens.map((token) => ({
+                    tag: token.tag,
+                    text: token.text,
+                })),
+                c.tokens,
+                c.input,
+            );
         }
 
         t.end();

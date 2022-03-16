@@ -43,6 +43,11 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
+            label: "[empty]",
+            tokens: [],
+            expression: Tree.Node.blank(range(0, 0)),
+        },
+        {
             label: "λ x .",
             tokens: assemble([λ, id("x"), dot]),
             expression: Tree.Node.abstraction(
@@ -306,9 +311,8 @@ Tap.test("parse from tokens", (t) => {
 
     for (const c of cases) {
         const result = Parser.parse(c.tokens);
-        t.ok(result.ok, c.label);
-        if (result.ok) t.same(result.expression, c.expression, c.label);
-        else console.log(result.errors);
+        t.strictSame(result.errors, [], c.label);
+        t.strictSame(result.expression, c.expression, c.label);
     }
 
     t.end();

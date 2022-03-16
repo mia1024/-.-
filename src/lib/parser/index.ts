@@ -8,26 +8,19 @@ export const enum ResultTag {
     ParseFail,
 }
 // TODO error recovery
-export type Result =
-    | {
-          readonly tag: ResultTag.Ok;
-          readonly expression: Tree.Tree<Tree.Metadata.Range> | null;
-      }
-    | {
-          readonly tag: ResultTag.LexFail;
-          readonly errors: readonly Lexer.Error[];
-      }
-    | {
-          readonly tag: ResultTag.ParseFail;
-          readonly errors: readonly Parser.Error[];
-      };
+export interface Result {
+    readonly expression: Tree.Tree<Tree.Metadata.Range>;
+    readonly lexErrors: readonly Lexer.Error[];
+    readonly parseErrors: readonly Parser.Error[];
+}
 
 export function parse(text: string): Result {
     const lex = Lexer.lex(text);
-    if (!lex.ok) return { tag: ResultTag.LexFail, errors: lex.errors };
-
     const parse = Parser.parse(lex.tokens);
-    if (!parse.ok) return { tag: ResultTag.ParseFail, errors: parse.errors };
 
-    return { tag: ResultTag.Ok, expression: parse.expression };
+    return {
+        expression: parse.expression,
+        lexErrors: lex.errors,
+        parseErrors: parse.errors,
+    };
 }

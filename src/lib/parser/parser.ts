@@ -36,9 +36,14 @@ interface Todo<Node> {
           };
 }
 
-export type Result =
-    | { readonly ok: true; readonly expression: Tree | null }
-    | { readonly ok: false; readonly errors: readonly Error[] };
+//export type Result =
+//    | { readonly ok: true; readonly expression: Tree | null }
+//    | { readonly ok: false; readonly errors: readonly Error[] };
+
+export interface Result {
+    readonly expression: Tree;
+    readonly errors: readonly Error[];
+}
 
 interface State {
     readonly todo: Todo<Tree | undefined>[];
@@ -192,8 +197,6 @@ parent node.
 
 */
 export function parse(tokens: readonly Token.Token[]): Result {
-    if (tokens.length === 0) return { ok: true, expression: null };
-
     const state: State = {
         todo: [
             {
@@ -213,9 +216,7 @@ export function parse(tokens: readonly Token.Token[]): Result {
 
         if (step.done) {
             const expression = handleEnd(state);
-            return state.errs.length === 0
-                ? { ok: true, expression }
-                : { ok: false, errors: state.errs };
+            return { expression, errors: state.errs };
         }
 
         const token = step.value;
@@ -263,15 +264,13 @@ function finalize(
     }
 }
 
-function handleEnd(state: State): Tree | null {
+function handleEnd(state: State): Tree {
     const top = state.todo.pop();
     if (typeof top === "undefined") throw Error("empty stack");
 
     for (let curr = top; ; ) {
-        if (curr.container.tag === ContainerTag.Paren) {
+        if (curr.container.tag === ContainerTag.Paren)
             state.errs.push({ tag: ErrorTag.UnclosedParenthesis });
-            return null;
-        }
 
         const tree = finalize(curr, state.end, state.end);
 

@@ -107,9 +107,6 @@ export const store = Pinia.defineStore("syntax", {
         },
         codeChange(code: string) {
             const result = Parser.parse(code);
-            if (result.tag !== Parser.ResultTag.Ok) return; // TODO
-
-            if (result.expression === null) return;
 
             // TODO tree diff & apply, for now we just replace
             const dict = Tree.flatten(
