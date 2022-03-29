@@ -7,7 +7,7 @@ import * as Token from "../lib/parser/token";
 import * as Tree from "../lib/tree";
 
 Tap.test("parse from tokens", (t) => {
-    const { pl, pr, q, dot, λ, id, range, assemble } = Token.shorthand;
+    const { pl, pr, _, dot, λ, id, range, assemble } = Token.shorthand;
 
     const cases: {
         label: string;
@@ -100,8 +100,8 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
-            label: "a b ? c",
-            tokens: assemble([id("a"), id("b"), q, id("c")]),
+            label: "a b _ c",
+            tokens: assemble([id("a"), id("b"), _, id("c")]),
             expression: Tree.Node.application(
                 Tree.Node.application(
                     Tree.Node.application(

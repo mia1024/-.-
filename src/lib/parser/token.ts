@@ -5,7 +5,7 @@ export const enum Tag {
     ParenL,
     ParenR,
     Lambda,
-    Question, // for representing empty variable names
+    Blank, // for representing empty variable names
     Dot,
     Identifier,
 }
@@ -20,8 +20,8 @@ export const definitions: readonly Definition[] = [
     { tag: Tag.ParenR, pattern: /\)/ },
     { tag: Tag.Dot, pattern: /\./ },
     { tag: Tag.Lambda, pattern: /\\|λ/ },
-    { tag: Tag.Question, pattern: /\?/ },
-    { tag: Tag.Identifier, pattern: /[A-Za-z_]\w*/ },
+    { tag: Tag.Blank, pattern: /_/ },
+    { tag: Tag.Identifier, pattern: /[A-Za-z0-9]+/ },
     { tag: null, pattern: /\s+/ },
 ].map((def) => ({ ...def, pattern: RegExp(def.pattern, "myu") }));
 
@@ -43,11 +43,11 @@ export const shorthand = {
     pl: { tag: Tag.ParenL, text: "(" },
     pr: { tag: Tag.ParenR, text: ")" },
     dot: { tag: Tag.Dot, text: "." },
-    q: { tag: Tag.Question, text: "?" },
+    _: { tag: Tag.Blank, text: "_" },
     lambda: { tag: Tag.Lambda, text: "λ" },
     λ: { tag: Tag.Lambda, text: "λ" },
     id(s: string) {
-        if (s.match(/^[A-Za-z_]\w*$/u) === null)
+        if (s.match(/^[A-Za-z0-9]+$/u) === null)
             throw Error("invalid identifier given");
         return { tag: Tag.Identifier, text: s };
     },

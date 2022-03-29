@@ -25,14 +25,14 @@ Tap.test("lexer", (t) => {
                 ],
             },
             {
-                input: "λa()bc?",
+                input: "λa()bc_",
                 tokens: [
                     { tag: Token.Tag.Lambda, text: "λ" },
                     { tag: Token.Tag.Identifier, text: "a" },
                     { tag: Token.Tag.ParenL, text: "(" },
                     { tag: Token.Tag.ParenR, text: ")" },
                     { tag: Token.Tag.Identifier, text: "bc" },
-                    { tag: Token.Tag.Question, text: "?" },
+                    { tag: Token.Tag.Blank, text: "_" },
                 ],
             },
             {
