@@ -33,6 +33,8 @@ interface Todo<Node> {
               tag: ContainerTag.Lambda;
               param: string;
               start: Tree.Metadata.Position;
+              paramStart: Tree.Metadata.Position;
+              paramEnd: Tree.Metadata.Position;
           };
 }
 
@@ -113,6 +115,8 @@ const handleToken: Record<
                     container: {
                         tag: ContainerTag.Lambda,
                         param: "",
+                        paramStart:first.value.range.start,
+                        paramEnd:first.value.range.start,
                         start: tokenLambda.range.start,
                     },
                 });
@@ -133,6 +137,8 @@ const handleToken: Record<
             container: {
                 tag: ContainerTag.Lambda,
                 param: first.value.text,
+                paramStart:first.value.range.start,
+                paramEnd:first.value.range.end,
                 start: tokenLambda.range.start,
             },
         });
@@ -153,6 +159,8 @@ const handleToken: Record<
                         container: {
                             tag: ContainerTag.Lambda,
                             param: token.text,
+                            paramStart: token.range.start,
+                            paramEnd: token.range.end,
                             start: token.range.start,
                         },
                     });
@@ -252,6 +260,9 @@ function finalize(
             return node;
         case ContainerTag.Lambda:
             return Tree.Node.abstraction(todo.container.param, node, {
+                start: todo.container.paramStart,
+                end: todo.container.paramEnd
+            },{
                 start: todo.container.start,
                 end: node.metadata.end,
             });
