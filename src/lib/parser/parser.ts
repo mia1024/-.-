@@ -24,8 +24,8 @@ const enum ContainerTag {
 
 // parametrized to distinguish between incomplete (i.e., not-necessarily-filled)
 // elements vs. complete (i.e., non-null node) elements
-interface Todo<Node> {
-    node: Node;
+interface Todo {
+    node: Tree | undefined;
     container:
         | { tag: ContainerTag.Root }
         | { tag: ContainerTag.Paren; start: Tree.Metadata.Position }
@@ -46,7 +46,7 @@ export interface Result {
 }
 
 interface State {
-    readonly todo: Todo<Tree | undefined>[];
+    readonly todo: Todo[];
     readonly errs: Error[];
     readonly tokens: IterableIterator<Token.Token>;
     end: Tree.Metadata.Position;
@@ -225,7 +225,7 @@ export function parse(tokens: readonly Token.Token[]): Result {
     }
 }
 
-function insertNode(elem: Todo<Tree | undefined>, node: Tree) {
+function insertNode(elem: Todo, node: Tree) {
     elem.node =
         typeof elem.node === "undefined"
             ? node
@@ -242,7 +242,7 @@ function insertTop(state: State, node: Tree) {
 }
 
 function finalize(
-    todo: Todo<Tree | undefined>,
+    todo: Todo,
     endBefore: Tree.Metadata.Position,
     endAfter: Tree.Metadata.Position,
 ): Tree {

@@ -4,7 +4,7 @@ export * as Node from "./node";
 export * as Metadata from "./metadata";
 
 // structured representation
-export type Tree<Metadata> = Node.Node<Tree<Metadata>, Metadata>;
+export type Tree<M> = Node.Node<Tree<M>, M>;
 
 // flattened representation
 export type TreeKey = symbol; // feeling cute, might change later
