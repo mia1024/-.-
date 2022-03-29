@@ -4,6 +4,7 @@
         "build": "vite build",
         "typecheck": "vue-tsc --noEmit",
         "upload": "./script/upload.bash",
+        "format": "prettier --write '**.vue' '**.ts'",
         "test": "tap"
     },
     "name": "lambda",

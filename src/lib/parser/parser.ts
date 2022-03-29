@@ -120,8 +120,8 @@ const handleToken: Record<
                     container: {
                         tag: ContainerTag.Lambda,
                         param: "",
-                        paramStart:first.value.range.start,
-                        paramEnd:first.value.range.start,
+                        paramStart: first.value.range.start,
+                        paramEnd: first.value.range.start,
                         start: tokenLambda.range.start,
                     },
                 });
@@ -142,8 +142,8 @@ const handleToken: Record<
             container: {
                 tag: ContainerTag.Lambda,
                 param: first.value.text,
-                paramStart:first.value.range.start,
-                paramEnd:first.value.range.end,
+                paramStart: first.value.range.start,
+                paramEnd: first.value.range.end,
                 start: tokenLambda.range.start,
             },
         });
@@ -260,13 +260,18 @@ function finalize(
         case ContainerTag.Root:
             return node;
         case ContainerTag.Lambda:
-            return Tree.Node.abstraction(todo.container.param, node, {
-                start: todo.container.paramStart,
-                end: todo.container.paramEnd
-            },{
-                start: todo.container.start,
-                end: node.metadata.end,
-            });
+            return Tree.Node.abstraction(
+                todo.container.param,
+                node,
+                {
+                    start: todo.container.paramStart,
+                    end: todo.container.paramEnd,
+                },
+                {
+                    start: todo.container.start,
+                    end: node.metadata.end,
+                },
+            );
         case ContainerTag.Paren:
             return {
                 ...node,
