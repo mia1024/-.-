@@ -31,6 +31,7 @@ Tap.test("basic `flatten` tests", (t) => {
             Tree.Node.abstraction(
                 "paramName",
                 Tree.Node.variable("bodyName", "bodyMeta"),
+                "paramMeta",
                 "absMeta",
             ),
         );
@@ -41,7 +42,10 @@ Tap.test("basic `flatten` tests", (t) => {
         t.equal(node?.data.tag, Tree.Node.Tag.Abstraction);
 
         if (node?.data.tag !== Tree.Node.Tag.Abstraction) return; // type guard
-        t.equal(node.data.parameter, "paramName");
+        t.strictSame(node.data.parameter, {
+            name: "paramName",
+            metadata: "paramMeta",
+        });
 
         const body = nodes.get(node.data.body);
         t.same(body, Tree.Node.variable("bodyName", "bodyMeta"));
