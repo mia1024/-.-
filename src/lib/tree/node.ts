@@ -19,7 +19,7 @@ export interface Node<Subtree, Metadata> {
         | { tag: Tag.Variable; name: string }
         | {
               tag: Tag.Abstraction;
-              parameter: string;
+              parameter: { name: string; metadata: Metadata };
               body: Subtree;
           }
         | {
@@ -50,12 +50,17 @@ export function variable<Subtree, Metadata>(
 }
 
 export function abstraction<Subtree, Metadata>(
-    parameter: string,
+    parameterName: string,
     body: Subtree,
+    parameterMetadata: Metadata,
     metadata: Metadata,
 ): Node<Subtree, Metadata> {
     return {
-        data: { tag: Tag.Abstraction, parameter, body },
+        data: {
+            tag: Tag.Abstraction,
+            parameter: { name: parameterName, metadata: parameterMetadata },
+            body,
+        },
         metadata,
     };
 }

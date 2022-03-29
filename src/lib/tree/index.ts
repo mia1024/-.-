@@ -24,7 +24,14 @@ export const mapMetadata = <A, B>(
             case Node.Tag.Variable:
                 return data;
             case Node.Tag.Abstraction:
-                return { ...data, body: go(data.body) };
+                return {
+                    ...data,
+                    parameter: {
+                        name: data.parameter.name,
+                        metadata: fn(data.parameter.metadata),
+                    },
+                    body: go(data.body),
+                };
             case Node.Tag.Application:
                 return {
                     ...data,
