@@ -90,6 +90,7 @@ const highlightField = CmState.StateField.define<CmView.DecorationSet>({
                             e.value.end.index,
                         ),
                     ],
+                    filter: ()=>false // remove all other effects
                 });
             } else if (e.is(removeHighlight)){
                 highlights=highlights.update({
@@ -119,18 +120,23 @@ Vue.watch(
                 });
             }
         }
-        if (before!==null){
-            const node = store.nodes.get(before)!;
-            if (node.metadata.range !== undefined) {
-                const effect = removeHighlight.of(node.metadata.range);
-                editor.value?.dispatch({
-                    effects: [
-                        effect,
-                        CmState.StateEffect.appendConfig.of(highlightField),
-                    ],
-                });
-            }
-        }
+        // we can't use the following code currently because reparse
+        // and all symbols changed.
+        // TODO: use the code below instead of removing all effects
+        //
+        // if (before!==null){
+        //     const node = store.nodes.get(before)!;
+        //     console.log(before)
+        //     if (node.metadata.range !== undefined) {
+        //         const effect = removeHighlight.of(node.metadata.range);
+        //         editor.value?.dispatch({
+        //             effects: [
+        //                 effect,
+        //                 CmState.StateEffect.appendConfig.of(highlightField),
+        //             ],
+        //         });
+        //     }
+        // }
     },
 );
 
