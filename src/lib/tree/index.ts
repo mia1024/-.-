@@ -123,7 +123,7 @@ export const stringifyCompact = <Metadata>(expr: Tree<Metadata>): string => {
         case Node.Tag.Variable:
             return expr.data.name || "?";
         case Node.Tag.Abstraction:
-            return `(λ${expr.data.parameter}. ${stringifyCompact(
+            return `(λ${expr.data.parameter.name}. ${stringifyCompact(
                 expr.data.body,
             )})`;
         case Node.Tag.Application:

@@ -52,7 +52,7 @@ export const store = Pinia.defineStore("syntax", {
                     node.data.name = name;
                     break;
                 case Tree.Node.Tag.Abstraction:
-                    node.data.parameter = name;
+                    node.data.parameter.name = name;
                     break;
                 default:
                     throw Error("not a renameable node");
@@ -63,7 +63,7 @@ export const store = Pinia.defineStore("syntax", {
         makeAbstraction(key: Tree.TreeKey) {
             this.nodes.set(
                 key,
-                Tree.Node.abstraction("x", this.newBlank(), {}),
+                Tree.Node.abstraction("x", this.newBlank(), {},{}),
             );
             this.stamp = Symbol();
             this.structureStamp = Symbol();
