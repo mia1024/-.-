@@ -6,13 +6,6 @@
         @mouseenter="setHover"
         @mouseleave="removeHover"
     >
-        <button
-            @click="store.prune(nodeKey)"
-            class="close"
-            v-if="expr.data.tag !== Tree.Node.Tag.Blank"
-        >
-            ×
-        </button>
         <div class="node-pad">
             <div
                 class="node"
@@ -21,6 +14,13 @@
                 }"
                 ref="node"
             >
+                <button
+                    @click="store.prune(nodeKey)"
+                    class="close"
+                    v-if="expr.data.tag !== Tree.Node.Tag.Blank"
+                >
+                    ×
+                </button>
                 <template v-if="expr.data.tag === Tree.Node.Tag.Blank">
                     <div class="hole" />
                     <div class="new">
@@ -218,32 +218,31 @@ function removeHover() {
     }
 }
 
-.close {
-    visibility: hidden;
-    border-radius: 100%;
-    color: white;
-    background-color: colors.$alert;
-    padding: 0.125em 0.25em;
-    line-height: 1em;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    border: none;
-    cursor: pointer;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-right: -0.25em;
-    margin-bottom: -0.25em;
-}
-
 .node {
     position: relative;
     color: colors.$primaryDark;
 
+    .close {
+        visibility: hidden;
+        border-radius: 100%;
+        color: white;
+        background-color: colors.$alert;
+        padding: 0.125em 0.25em;
+        line-height: 1em;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        border: none;
+        cursor: pointer;
+
+        position: absolute;
+        bottom: 100%;
+        right: 100%;
+        margin-right: -0.25em;
+        margin-bottom: -0.25em;
+    }
 
     .var {
         width: 3rem;
