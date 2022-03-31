@@ -32,4 +32,5 @@ print $'Done\n'
 
 print "Uploading..."
 rsync -rua --delete 'dist/' "$username@cs.hmc.edu:~/public_html/lambda/"
-print $'Website live at https://cs.hmc.edu/~$username/lambda (´｡• ω •｡`)\n'
+print $"Website live at https://cs.hmc.edu/~$username/lambda"
+print $' (´｡• ω •｡`)\n'
