@@ -11,6 +11,7 @@ import * as Vue from "vue";
 import * as CmState from "@codemirror/state";
 import * as CmView from "@codemirror/view";
 import * as CmGutter from "@codemirror/gutter";
+import { StateEffect } from "@codemirror/state";
 
 const store = Store.syntax();
 
@@ -65,6 +66,74 @@ Vue.watch([editor, () => store.structureStamp], () => {
     );
 });
 
+const highlight = CmState.StateEffect.define<Tree.Metadata.Range>();
+const removeHighlight = CmState.StateEffect.define<Tree.Metadata.Range>();
+const highlightMark = CmView.Decoration.mark({ class: "cm-node-highlight" });
+//const highlightTheme = CmView.
+// mostly copied from https://codemirror.net/6/examples/decoration/ because
+// idk what im doing
+const highlightField = CmState.StateField.define<CmView.DecorationSet>({
+    create: function (state: CmState.EditorState): CmView.DecorationSet {
+        return CmView.Decoration.none;
+    },
+    update: function (
+        highlights: CmView.DecorationSet,
+        transaction: CmState.Transaction,
+    ): CmView.DecorationSet {
+        highlights.map(transaction.changes);
+        for (let e of transaction.effects) {
+            if (e.is(highlight)) {
+                highlights = highlights.update({
+                    add: [
+                        highlightMark.range(
+                            e.value.start.index,
+                            e.value.end.index,
+                        ),
+                    ],
+                });
+            } else if (e.is(removeHighlight)){
+                highlights=highlights.update({
+                    filter: (from,to,decoration) =>
+                         !(from===e.value.start.index && to===e.value.end.index)
+                })
+            }
+        }
+
+        return highlights;
+    },
+    provide: (f) => CmView.EditorView.decorations.from(f),
+});
+
+Vue.watch(
+    () => store.selected,
+    (after, before) => {
+        if (after !== null) {
+            const node = store.nodes.get(after)!;
+            if (node.metadata.range !== undefined) {
+                const effect = highlight.of(node.metadata.range);
+                editor.value?.dispatch({
+                    effects: [
+                        effect,
+                        CmState.StateEffect.appendConfig.of(highlightField),
+                    ],
+                });
+            }
+        }
+        if (before!==null){
+            const node = store.nodes.get(before)!;
+            if (node.metadata.range !== undefined) {
+                const effect = removeHighlight.of(node.metadata.range);
+                editor.value?.dispatch({
+                    effects: [
+                        effect,
+                        CmState.StateEffect.appendConfig.of(highlightField),
+                    ],
+                });
+            }
+        }
+    },
+);
+
 //const code = Vue.computed(() => {
 //    const root = store.trail[store.trail.length - 1]!;
 //    const tree = Tree.structure(store.nodes, root);
@@ -87,5 +156,13 @@ textarea {
     bottom: 0;
 
     display: grid;
+}
+</style>
+
+<style lang="scss">
+@use "@/scss/colors";
+
+.cm-node-highlight {
+    color: colors.$secondaryLight;
 }
 </style>

@@ -6,7 +6,7 @@ import * as Parser from "@lib/parser";
 export interface State {
     nodes: Tree.TreeDict<Tree.Metadata.Full>;
     trail: Tree.TreeKey[];
-    focus: Tree.TreeKey | null;
+    selected: Tree.TreeKey | null;
 
     // updated each time tree structure is modified; useful for triggering
     // DOM-layout detection reupdates via `watch`.  maybe we can use
@@ -28,7 +28,7 @@ export const store = Pinia.defineStore("syntax", {
         return {
             nodes,
             trail: [root],
-            focus: null,
+            selected: null,
             stamp: Symbol(),
             structureStamp: Symbol(),
         };
@@ -110,7 +110,7 @@ export const store = Pinia.defineStore("syntax", {
 
             // TODO tree diff & apply, for now we just replace
             const dict = Tree.flatten(
-                Tree.mapMetadata(result.expression, () => ({})),
+                Tree.mapMetadata(result.expression, (range) => ({range})),
             );
             this.nodes = dict.nodes;
             this.trail = [dict.root];

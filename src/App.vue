@@ -35,9 +35,12 @@ function handleKey(ev: KeyboardEvent) {
 }
 
 function warnBeforeLeave(e: BeforeUnloadEvent) {
-    // disabling for now because it's annoying af while debugging
-    //e.preventDefault();
-    //e.returnValue = "";
+    e.preventDefault();
+    e.returnValue = "";
+}
+
+if (import.meta.hot){
+    import.meta.hot.on('vite:beforeFullReload',e=>window.removeEventListener("beforeunload", warnBeforeLeave))
 }
 
 Vue.onMounted(() => {

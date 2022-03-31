@@ -102,7 +102,7 @@ const store = Store.syntax();
 const isRoot = Vue.computed(
     () => store.trail[store.trail.length - 1]! === props.nodeKey,
 );
-const isHover = Vue.computed(() => store.focus === props.nodeKey);
+const isHover = Vue.computed(() => store.selected === props.nodeKey);
 
 //const isRoot = Vue.computed(() => )
 
@@ -144,12 +144,13 @@ Vue.onUnmounted(() => {
 });
 
 function setHover() {
-    store.focus = props.nodeKey;
+    store.selected = props.nodeKey;
 }
 
 function removeHover() {
-    if (store.focus === props.nodeKey) store.focus = null;
+    if (store.selected === props.nodeKey) store.selected = null;
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -233,8 +234,8 @@ function removeHover() {
     cursor: pointer;
 
     position: absolute;
-    bottom: 100%;
-    right: 100%;
+    top: 0;
+    left: 0;
     margin-right: -0.25em;
     margin-bottom: -0.25em;
 }
