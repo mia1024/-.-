@@ -41,6 +41,7 @@ Vue.onMounted(() => {
                         return null;
                     },
                 }),
+                highlightField
             ],
         }),
         parent: container.value,
@@ -68,6 +69,7 @@ Vue.watch([editor, () => store.structureStamp], () => {
 
 const highlight = CmState.StateEffect.define<Tree.Metadata.Range>();
 const removeHighlight = CmState.StateEffect.define<Tree.Metadata.Range>();
+const removeAllHighlights = CmState.StateEffect.define<null>();
 const highlightMark = CmView.Decoration.mark({ class: "cm-node-highlight" });
 //const highlightTheme = CmView.
 // mostly copied from https://codemirror.net/6/examples/decoration/ because
@@ -90,12 +92,15 @@ const highlightField = CmState.StateField.define<CmView.DecorationSet>({
                             e.value.end.index,
                         ),
                     ],
-                    filter: ()=>false // remove all other effects
                 });
             } else if (e.is(removeHighlight)){
                 highlights=highlights.update({
                     filter: (from,to,decoration) =>
                          !(from===e.value.start.index && to===e.value.end.index)
+                })
+            } else if (e.is(removeAllHighlights)){
+                highlights=highlights.update({
+                    filter: ()=>false // remove all other effects
                 })
             }
         }
@@ -111,14 +116,20 @@ Vue.watch(
         if (after !== null) {
             const node = store.nodes.get(after)!;
             if (node.metadata.range !== undefined) {
-                const effect = highlight.of(node.metadata.range);
                 editor.value?.dispatch({
                     effects: [
-                        effect,
-                        CmState.StateEffect.appendConfig.of(highlightField),
+                        removeAllHighlights.of(null),
+                        highlight.of(node.metadata.range)
                     ],
+                    sequential: true,
                 });
             }
+        } else {
+            editor.value?.dispatch({
+                effects:[
+                        removeAllHighlights.of(null),
+                ]
+            })
         }
         // we can't use the following code currently because reparse
         // and all symbols changed.
