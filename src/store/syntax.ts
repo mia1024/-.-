@@ -24,7 +24,15 @@ export const store = Pinia.defineStore("syntax", {
     state: (): State => {
         const root = Symbol();
         const nodes = Tree.newTreeDict<Tree.Metadata.Full>();
-        nodes.set(root, Tree.Node.blank({}));
+        nodes.set(
+            root,
+            Tree.Node.blank({
+                range: {
+                    start: Tree.Metadata.startPosition,
+                    end: Tree.Metadata.startPosition,
+                },
+            }),
+        );
         return {
             nodes,
             trail: [root],
@@ -34,83 +42,18 @@ export const store = Pinia.defineStore("syntax", {
         };
     },
     actions: {
-        newBlank() {
-            const key = Tree.newTreeKey();
-            this.nodes.set(key, Tree.Node.blank({}));
-            return key;
-        },
-        makeVariable(key: Tree.TreeKey) {
-            this.nodes.set(key, Tree.Node.variable("x", {}));
-            this.stamp = Symbol();
-            this.structureStamp = Symbol();
-        },
-        rename(key: Tree.TreeKey, name: string) {
-            const node = this.nodes.get(key);
-            if (typeof node === "undefined") throw Error("missing node");
-            switch (node.data.tag) {
-                case Tree.Node.Tag.Variable:
-                    node.data.name = name;
-                    break;
-                case Tree.Node.Tag.Abstraction:
-                    node.data.parameter.name = name;
-                    break;
-                default:
-                    throw Error("not a renameable node");
-            }
-            this.stamp = Symbol();
-            this.structureStamp = Symbol();
-        },
-        makeAbstraction(key: Tree.TreeKey) {
-            this.nodes.set(
-                key,
-                Tree.Node.abstraction("x", this.newBlank(), {},{}),
-            );
-            this.stamp = Symbol();
-            this.structureStamp = Symbol();
-        },
-        makeApplication(key: Tree.TreeKey) {
-            this.nodes.set(
-                key,
-                Tree.Node.application(this.newBlank(), this.newBlank(), {}),
-            );
-            this.stamp = Symbol();
-            this.structureStamp = Symbol();
-        },
         setGeometry(key: Tree.TreeKey, geometry: Tree.Metadata.Geometry) {
             const node = this.nodes.get(key);
             if (typeof node === "undefined")
                 throw Error("updateGeometry on missing node");
             node.metadata.geometry = geometry;
         },
-        prune(key: Tree.TreeKey) {
-            const go = (k: Tree.TreeKey) => {
-                const node = this.nodes.get(k);
-                if (typeof node === "undefined")
-                    throw Error("prune root missing");
-
-                switch (node.data.tag) {
-                    case Tree.Node.Tag.Abstraction:
-                        go(node.data.body);
-                        break;
-                    case Tree.Node.Tag.Application:
-                        go(node.data.function);
-                        go(node.data.argument);
-                        break;
-                }
-
-                node.data = { tag: Tree.Node.Tag.Blank };
-            };
-
-            go(key);
-            this.stamp = Symbol();
-            this.structureStamp = Symbol();
-        },
         codeChange(code: string) {
             const result = Parser.parse(code);
 
             // TODO tree diff & apply, for now we just replace
             const dict = Tree.flatten(
-                Tree.mapMetadata(result.expression, (range) => ({range})),
+                Tree.mapMetadata(result.expression, (range) => ({ range })),
             );
             this.nodes = dict.nodes;
             this.trail = [dict.root];
