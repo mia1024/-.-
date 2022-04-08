@@ -12,7 +12,7 @@ import * as Store from "@/store";
 //import * as Syntax from "@lib/syntax";
 const store = Store.syntax();
 
-//const root = store.nodes.get(store.trail[store.trail.length-1]!)!
+type TreeNodeType = InstanceType<typeof TreeNode>
 </script>
 
 <style scoped lang="scss">

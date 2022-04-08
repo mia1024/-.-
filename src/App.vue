@@ -62,26 +62,24 @@ Vue.onUnmounted(() => {
     height: 100vh;
 
     .graph-view {
-        flex-basis: 0;
-        flex-grow: 2;
+        width: #{calc(100 / 3 * 2)}vw;
+        height: 100%;
         border-right: 1px solid transparentize(colors.$foreground, 0.3);
+        overflow: auto;
     }
 
     .right-side-wrapper {
-        flex-basis: 0;
-        flex-grow: 1;
+        width: #{calc(100 / 3)}vw;
         display: flex;
         flex-direction: column;
 
         .library-view {
-            flex-basis: 0;
-            flex-grow: 2;
+            height: #{calc(100 / 3 * 2)}vh;
             border-bottom: 1px solid transparentize(colors.$foreground, 0.3);
         }
 
         .code-view {
-            flex-basis: 0;
-            flex-grow: 1;
+            height: #{calc(100 / 3)}vh;
             position: relative;
         }
     }
