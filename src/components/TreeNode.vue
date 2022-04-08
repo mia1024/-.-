@@ -15,7 +15,7 @@
                 ref="node"
             >
                 <button
-                    @click="store.prune(nodeKey)"
+                    @click="Action.clearNode(expr.metadata)"
                     class="close"
                     v-if="expr.data.tag !== Tree.Node.Tag.Blank"
                 >
@@ -25,13 +25,17 @@
                     <div class="hole" />
                     <div class="new">
                         <div class="pad">
-                            <button @click="store.makeVariable(nodeKey)">
+                            <button @click="Action.makeVariable(expr.metadata)">
                                 𝑥
                             </button>
-                            <button @click="store.makeAbstraction(nodeKey)">
+                            <button
+                                @click="Action.makeAbstraction(expr.metadata)"
+                            >
                                 λ
                             </button>
-                            <button @click="store.makeApplication(nodeKey)">
+                            <button
+                                @click="Action.makeApplication(expr.metadata)"
+                            >
                                 $
                             </button>
                         </div>
@@ -41,7 +45,7 @@
                     <input
                         class="var"
                         :value="expr.data.name"
-                        @input="(e) => store.rename(nodeKey, (e.target as HTMLInputElement).value)"
+                        @input="onRename(expr.metadata)($event)"
                     />
                 </template>
                 <template v-if="expr.data.tag === Tree.Node.Tag.Abstraction">
@@ -58,7 +62,7 @@
                     λ
                     <input
                         :value="expr.data.parameter.name"
-                        @input="e => store.rename(nodeKey, (e.target as HTMLInputElement).value)"
+                        @input="onRename(expr.data.parameter.metadata)($event)"
                     />
                 </div>
                 <TreeNode
@@ -87,6 +91,7 @@
 import * as Tree from "@lib/tree";
 import * as Store from "../store";
 import * as Vue from "vue";
+import * as Action from "@/editor/action";
 
 const tree = Vue.ref<HTMLElement | null>(null);
 const node = Vue.ref<HTMLElement | null>(null);
@@ -112,6 +117,9 @@ const expr = Vue.computed(() => {
     if (typeof node === "undefined") throw Error("missing node");
     return node;
 });
+
+const onRename = (metadata: Tree.Metadata.Full) => (e: Event) =>
+    Action.rename(metadata, (e.target as HTMLInputElement).value);
 
 const getBox = (elem: HTMLElement) => ({
     left: elem.offsetLeft,
@@ -150,7 +158,6 @@ function setHover() {
 function removeHover() {
     if (store.selected === props.nodeKey) store.selected = null;
 }
-
 </script>
 
 <style scoped lang="scss">
