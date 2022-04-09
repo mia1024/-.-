@@ -1,6 +1,5 @@
 <template>
     <div class="code-container" ref="container"></div>
-    <!--textarea v-model="code"></textarea-->
 </template>
 
 <script lang="ts" setup>
@@ -19,18 +18,10 @@ Vue.onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-textarea {
-    margin: 1rem;
-    font-size: 1rem;
-    font-family: "JetBrains Mono", monospace;
-}
-
+@use "@/scss/colors";
 .code-container {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    grid-area: code;
+    border-top: 1px solid transparentize(colors.$foreground, 0.3);
 
     display: grid;
 }

@@ -1,18 +1,9 @@
 <template>
-    <div class="main">
-        <div class="graph-view">
-            <Tree />
-        </div>
-
-        <div class="right-side-wrapper">
-            <div class="library-view">
-                <Library />
-            </div>
-            <div class="code-view">
-                <Code />
-            </div>
-        </div>
-    </div>
+    <main>
+        <Tree />
+        <Library />
+        <Code />
+    </main>
 </template>
 
 <script lang="ts" setup>
@@ -59,31 +50,16 @@ Vue.onUnmounted(() => {
 <style scoped lang="scss">
 @use "@/scss/colors";
 
-.main {
-    display: flex;
-    height: 100vh;
+main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
 
-    .graph-view {
-        width: #{calc(100 / 3 * 2)}vw;
-        height: 100%;
-        border-right: 1px solid transparentize(colors.$foreground, 0.3);
-        overflow: auto;
-    }
-
-    .right-side-wrapper {
-        width: #{calc(100 / 3)}vw;
-        display: flex;
-        flex-direction: column;
-
-        .library-view {
-            height: #{calc(100 / 3 * 2)}vh;
-            border-bottom: 1px solid transparentize(colors.$foreground, 0.3);
-        }
-
-        .code-view {
-            height: #{calc(100 / 3)}vh;
-            position: relative;
-        }
-    }
+    grid-template-areas: "tree library" "tree code";
+    grid-template-columns: 67% 1fr;
+    grid-template-rows: 67% 1fr;
 }
 </style>

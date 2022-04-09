@@ -75,6 +75,7 @@ Vue.onUnmounted(() => window.removeEventListener("resize", measure));
 
     align-self: start;
     padding: 0.5rem;
+    white-space: nowrap;
 
     input {
         width: 3rem;

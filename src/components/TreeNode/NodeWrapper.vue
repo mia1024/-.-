@@ -110,7 +110,7 @@ Vue.onUnmounted(() => window.removeEventListener("resize", measure));
     }
 
     .node {
-        padding: 0.25rem 0.75rem;
+        padding: 0.5rem;
     }
 
     .node,

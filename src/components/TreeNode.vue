@@ -94,7 +94,8 @@ function removeHover() {
     display: flex;
     flex-direction: column;
 
-    * + & {
+    & + &,
+    .param + & {
         // spacing in-between sibling trees.  I'd put this as `grid-column-gap`
         // on the `Children` container, but CSS grid perf issues, yada yada
         margin-left: 1rem;
@@ -108,13 +109,11 @@ function removeHover() {
 
     //background-color: rgba(0, 80, 50, 0.03);
     padding: 0.5rem;
+    margin: -0.5rem;
     border-radius: 0.5rem;
 
-    // add transparent border to make sure layout doesn't shift with border
-    border: 2px solid transparent;
-
     &.hover {
-        border: 2px dashed colors.$secondaryLight;
+        outline: 2px dashed colors.$secondaryLight;
     }
 }
 </style>
