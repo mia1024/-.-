@@ -41,22 +41,18 @@ const edges = Vue.computed(() => {
         if (typeof node === "undefined") throw Error("edges: missing node");
         const geom = node.metadata.geometry;
 
+        const parent = geom === undefined ? geom : getCenter(geom);
+
         switch (node.data.tag) {
             case Tree.Node.Tag.Abstraction:
-                const paramBox = node.metadata.geometry?.left;
+                const paramGeom = node.data.parameter.metadata.geometry;
                 const bodyGeom = store.nodes.get(node.data.body)?.metadata
                     .geometry;
-                if (typeof geom !== "undefined") {
-                    if (typeof paramBox !== "undefined")
-                        edges.push({
-                            parent: getCenter(geom.node),
-                            child: getCenter(paramBox),
-                        });
+                if (parent !== undefined) {
+                    if (paramGeom !== undefined)
+                        edges.push({ parent, child: getCenter(paramGeom) });
                     if (typeof bodyGeom !== "undefined")
-                        edges.push({
-                            parent: getCenter(geom.node),
-                            child: getCenter(bodyGeom.node),
-                        });
+                        edges.push({ parent, child: getCenter(bodyGeom) });
                 }
                 go(node.data.body);
                 break;
@@ -65,17 +61,11 @@ const edges = Vue.computed(() => {
                     .geometry;
                 const argGeom = store.nodes.get(node.data.argument)?.metadata
                     .geometry;
-                if (typeof geom !== "undefined") {
+                if (parent !== undefined) {
                     if (typeof fnGeom !== "undefined")
-                        edges.push({
-                            parent: getCenter(geom.node),
-                            child: getCenter(fnGeom.node),
-                        });
+                        edges.push({ parent, child: getCenter(fnGeom) });
                     if (typeof argGeom !== "undefined")
-                        edges.push({
-                            parent: getCenter(geom.node),
-                            child: getCenter(argGeom.node),
-                        });
+                        edges.push({ parent, child: getCenter(argGeom) });
                 }
                 go(node.data.function);
                 go(node.data.argument);

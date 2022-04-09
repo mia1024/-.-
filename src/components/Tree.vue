@@ -1,7 +1,7 @@
 <template>
     <div class="view">
         <Edges />
-        <TreeNode :nodeKey="store.trail[store.trail.length-1]!" />
+        <TreeNode :treeKey="store.trail[store.trail.length-1]!" />
     </div>
 </template>
 

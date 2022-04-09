@@ -1,20 +1,11 @@
+import * as Lib from "@lib/common";
+
 export const enum Tag {
     Variable,
     Abstraction,
     Application,
     Blank,
 }
-
-export interface Data<Subtree, Metadata> {
-    [Tag.Blank]: {};
-    [Tag.Variable]: { name: string };
-    [Tag.Abstraction]: {
-        parameter: { name: string; metadata: Metadata };
-        body: Subtree;
-    };
-    [Tag.Application]: { function: Subtree; argument: Subtree };
-}
-
 // We parametrize `Node` by the `Subtree` type to conveniently enable both the
 // structured and flattened tree representations.  The structured
 // representation (subnodes are stored directly as nested `Node`s) is
@@ -23,6 +14,27 @@ export interface Data<Subtree, Metadata> {
 // corresponding to keys in a dictionary) is more well-adapted to encoding UI
 // state.  The `Metadata` type parameter is used to store UI-related data, e.g.
 // window coordinates for drawing edges, row/col numbers in code editor, etc.
+
+//export type Data<Subtree, Metadata> = {
+//    [Tag.Blank]: {};
+//    [Tag.Variable]: { name: string };
+//    [Tag.Abstraction]: {
+//        parameter: { name: string; metadata: Metadata };
+//        body: Subtree;
+//    };
+//    [Tag.Application]: { function: Subtree; argument: Subtree };
+//};
+//
+//export type Node<Subtree, Metadata> = {
+//    data: {}
+//    metadata: Metadata;
+//};
+
+//export type NodeFor<T extends Tag, Subtree, Metadata> = {
+//    data: Data<Subtree, Metadata>[T];
+//    metadata: Metadata;
+//};
+
 export interface Node<Subtree, Metadata> {
     data:
         | { tag: Tag.Blank }
