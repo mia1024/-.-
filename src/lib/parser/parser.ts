@@ -126,6 +126,7 @@ const handleToken: Record<
                     },
                 });
                 return;
+            case Token.Tag.Blank:
             case Token.Tag.Identifier:
                 break;
             default:
@@ -141,7 +142,8 @@ const handleToken: Record<
             node: undefined,
             container: {
                 tag: ContainerTag.Lambda,
-                param: first.value.text,
+                param:
+                    first.value.tag === Token.Tag.Blank ? "" : first.value.text,
                 paramStart: first.value.range.start,
                 paramEnd: first.value.range.end,
                 start: tokenLambda.range.start,
@@ -158,12 +160,14 @@ const handleToken: Record<
             state.end = token.range.end;
 
             switch (token.tag) {
+                case Token.Tag.Blank:
                 case Token.Tag.Identifier:
                     state.todo.push({
                         node: undefined,
                         container: {
                             tag: ContainerTag.Lambda,
-                            param: token.text,
+                            param:
+                                token.tag === Token.Tag.Blank ? "" : token.text,
                             paramStart: token.range.start,
                             paramEnd: token.range.end,
                             start: token.range.start,

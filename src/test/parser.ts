@@ -144,6 +144,31 @@ Tap.test("parse from tokens", (t) => {
             ),
         },
         {
+            label: "λ _ . x",
+            tokens: assemble([λ, _, dot, id("x")]),
+            expression: Tree.Node.abstraction(
+                "",
+                Tree.Node.variable("x", range(6, 7)),
+                range(2, 3),
+                range(0, 7),
+            ),
+        },
+        {
+            label: "λ _ _ . x",
+            tokens: assemble([λ, _, _, dot, id("x")]),
+            expression: Tree.Node.abstraction(
+                "",
+                Tree.Node.abstraction(
+                    "",
+                    Tree.Node.variable("x", range(8, 9)),
+                    range(4, 5),
+                    range(4, 9),
+                ),
+                range(2, 3),
+                range(0, 9),
+            ),
+        },
+        {
             label: "λ x . λ y . y x",
             tokens: assemble([
                 λ,
