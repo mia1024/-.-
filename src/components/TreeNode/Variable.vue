@@ -13,15 +13,10 @@ defineProps<{
 
 <template>
     <NodeWrapper :blank="false" :treeKey="treeKey" :metadata="metadata">
-        <IdentifierInput class="var" :value="name" :metadata="metadata" />
+        <IdentifierInput :value="name" :metadata="metadata" />
     </NodeWrapper>
 </template>
 
 <style scoped lang="scss">
 @use "@/scss/colors";
-
-.var {
-    width: 3rem;
-    text-align: center;
-}
 </style>

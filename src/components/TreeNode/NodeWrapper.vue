@@ -32,11 +32,21 @@ function measure() {
 // rendered already.
 Vue.watch(
     () => props.treeKey,
-    () => Vue.nextTick(measure),
+    // this is dumb, but we do three `nextTick`s here because the first one is
+    // used to measure identifier input sizes & resize those input boxes; we
+    // have to wait for that one to finish first, then remeasure layout.  so why
+    // not two?  idk, it didn't work so I added one lol.  there is a better way
+    // to do this--watch for a token associated with the tree, and update
+    // according to that (instead of this specific key).  also, render inputs
+    // directly from nodes to explicitly specify dependency
+    () =>
+        Vue.nextTick()
+            .then(() => Vue.nextTick(measure))
+            .then(() => Vue.nextTick(measure)),
 );
 
 Vue.onMounted(() => {
-    measure();
+    Vue.nextTick(measure);
     window.addEventListener("resize", measure);
 });
 Vue.onUnmounted(() => window.removeEventListener("resize", measure));

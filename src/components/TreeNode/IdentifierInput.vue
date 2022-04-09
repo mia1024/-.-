@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as Action from "@/editor/action";
 import * as Tree from "@lib/tree";
+import * as Vue from "vue";
 
 const props = defineProps<{
     value: string;
@@ -23,13 +24,50 @@ function onKey(event: KeyboardEvent) {
         event.preventDefault();
 }
 
+const sizerElem = Vue.shallowRef<HTMLDivElement>();
+const width = Vue.shallowRef(0);
+function measure() {
+    if (sizerElem.value === undefined) return;
+    width.value = sizerElem.value.clientWidth;
+}
+Vue.onMounted(measure);
+
+Vue.watch(
+    () => props.value,
+    () => Vue.nextTick(measure),
+);
+
 function onInput(event: Event) {
     Action.rename(props.metadata, (event.target as HTMLInputElement).value);
 }
 </script>
 
 <template>
-    <input :value="value" @keydown="onKey" @input="onInput" />
+    <div class="wrapper">
+        <div class="sizer" ref="sizerElem">{{ value }}</div>
+        <input
+            :value="value"
+            :style="{ width: `${width}px` }"
+            size="1"
+            @keydown="onKey"
+            @input="onInput"
+        />
+    </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+input {
+    text-align: center;
+}
+.wrapper {
+    position: relative;
+    font-family: "JetBrains Mono", monospace;
+}
+.sizer {
+    padding: 0 0.5rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    visibility: hidden;
+}
+</style>
