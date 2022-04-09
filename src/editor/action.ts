@@ -23,19 +23,13 @@ export function makeApplication(data: Tree.Metadata.Full) {
     replace(data, "(() ())");
 }
 
-function validIdentifier(value: string) {
-    return value.match(/^[A-Za-z0-9]+$/) !== null;
+function sanitizeIdentifier(value: string) {
+    const clean = value.replace(/[^A-Za-z0-9]/g, "");
+    return clean || "_";
 }
 
 export function rename(data: Tree.Metadata.Full, value: string) {
-    if (value.length === 0) {
-        replace(data, "_");
-        return;
-    }
-    if (!validIdentifier(value)) {
-        return;
-    }
-    replace(data, value);
+    replace(data, sanitizeIdentifier(value));
 }
 
 export function clearNode(data: Tree.Metadata.Full) {

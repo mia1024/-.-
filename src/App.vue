@@ -39,8 +39,10 @@ function warnBeforeLeave(e: BeforeUnloadEvent) {
     e.returnValue = "";
 }
 
-if (import.meta.hot){
-    import.meta.hot.on('vite:beforeFullReload',e=>window.removeEventListener("beforeunload", warnBeforeLeave))
+if (import.meta.hot) {
+    import.meta.hot.on("vite:beforeFullReload", (e) =>
+        window.removeEventListener("beforeunload", warnBeforeLeave),
+    );
 }
 
 Vue.onMounted(() => {

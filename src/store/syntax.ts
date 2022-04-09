@@ -7,17 +7,6 @@ export interface State {
     nodes: Tree.TreeDict<Tree.Metadata.Full>;
     trail: Tree.TreeKey[];
     selected: Tree.TreeKey | null;
-
-    // updated each time tree structure is modified; useful for triggering
-    // DOM-layout detection reupdates via `watch`.  maybe we can use
-    // `ResizeObserver` too, but we'll figure that out later.
-    stamp: symbol;
-
-    // updated each time structure is modified from interactive/structural
-    // editor _only_ (not code editor); used via `watch` to trigger code
-    // update.  TODO this is a temporary hack--eventually i think we want to do
-    // smarter, diff'ed changes based on ranges
-    structureStamp: symbol;
 }
 
 export const store = Pinia.defineStore("syntax", {
@@ -37,16 +26,30 @@ export const store = Pinia.defineStore("syntax", {
             nodes,
             trail: [root],
             selected: null,
-            stamp: Symbol(),
-            structureStamp: Symbol(),
         };
     },
     actions: {
-        setGeometry(key: Tree.TreeKey, geometry: Tree.Metadata.Geometry) {
+        setNodeGeometry(
+            key: Tree.TreeKey,
+            geometry: Tree.Metadata.BoundingBox,
+        ) {
             const node = this.nodes.get(key);
             if (typeof node === "undefined")
-                throw Error("updateGeometry on missing node");
+                throw Error("setNodeGeometry on missing node");
             node.metadata.geometry = geometry;
+        },
+        setParameterGeometry(
+            key: Tree.TreeKey,
+            geometry: Tree.Metadata.BoundingBox,
+        ) {
+            const node = this.nodes.get(key);
+            if (typeof node === "undefined")
+                throw Error("setParameterGeometry on missing node");
+
+            // oh how I wish I could make this type-safe...
+            if (node.data.tag !== Tree.Node.Tag.Abstraction)
+                throw Error("setParameterGeometry on non-abstraction node");
+            node.data.parameter.metadata.geometry = geometry;
         },
         codeChange(code: string) {
             const result = Parser.parse(code);
@@ -57,7 +60,6 @@ export const store = Pinia.defineStore("syntax", {
             );
             this.nodes = dict.nodes;
             this.trail = [dict.root];
-            this.stamp = Symbol();
         },
     },
 });

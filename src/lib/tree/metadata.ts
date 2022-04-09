@@ -6,9 +6,8 @@ export interface BoundingBox {
 }
 
 export interface Geometry {
-    tree: BoundingBox;
-    node: BoundingBox;
-    left?: BoundingBox;
+    tree?: BoundingBox;
+    node?: BoundingBox;
 }
 
 export interface Position {
@@ -23,8 +22,8 @@ export interface Range {
 }
 
 export interface Full {
-    geometry?: Geometry;
-    range?: Range;
+    geometry?: BoundingBox;
+    range: Range;
 }
 
 export const startPosition: Position = Object.freeze({
