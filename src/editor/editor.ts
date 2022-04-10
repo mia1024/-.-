@@ -1,7 +1,7 @@
 import * as CmState from "@codemirror/state";
 import * as CmView from "@codemirror/view";
 import * as CmGutter from "@codemirror/gutter";
-
+import {highlightField} from "@/editor/extensions/highlight";
 import * as Store from "@/store";
 
 export const editor = new CmView.EditorView({
@@ -25,7 +25,7 @@ export const editor = new CmView.EditorView({
                     return null;
                 },
             }),
-            //highlightField,
+            highlightField,
         ],
     }),
 });

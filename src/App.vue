@@ -26,8 +26,10 @@ function handleKey(ev: KeyboardEvent) {
 }
 
 function warnBeforeLeave(e: BeforeUnloadEvent) {
-    e.preventDefault();
-    e.returnValue = "";
+    if (import.meta.env.PROD){
+        e.preventDefault();
+        e.returnValue = "";
+    }
 }
 
 if (import.meta.hot) {
