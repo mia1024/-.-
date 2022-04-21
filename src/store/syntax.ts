@@ -2,6 +2,7 @@
 import * as Pinia from "pinia";
 import * as Tree from "@lib/tree";
 import * as Parser from "@lib/parser";
+import {compress} from "@lib/common/compression";
 
 export interface State {
     nodes: Tree.TreeDict<Tree.Metadata.Full>;
@@ -60,6 +61,10 @@ export const store = Pinia.defineStore("syntax", {
             );
             this.nodes = dict.nodes;
             this.trail = [dict.root];
+            if (code && code != '()')
+                location.hash=compress(code)
+            else
+                location.hash=''
         },
     },
 });

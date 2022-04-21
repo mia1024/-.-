@@ -13,9 +13,14 @@ import Library from "@components/Library.vue";
 import Code from "@components/Code.vue";
 
 import * as Store from "./store";
+import {decompress} from "@lib/common/compression";
 
 const store = Store.syntax();
-
+if (location.hash) {
+    const code = decompress(location.hash);
+    store.codeChange(code)
+    console.log("Tree initialized from fragment", code);
+}
 function handleKey(ev: KeyboardEvent) {
     // disabling for now because it's annoying af when it accidentally triggers
     //if (
